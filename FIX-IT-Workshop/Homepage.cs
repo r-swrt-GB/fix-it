@@ -374,7 +374,10 @@ namespace FIX_IT_Workshop
 
         private void label6_Click(object sender, EventArgs e)
         {
+            //tbcHomepage is a TabControl 
+
             tbcHomepage.SelectedTab = tbpUsers;
+            showNewUserPanel(pnlUsers);
             selectLabel(lblUsers);
         }
 
@@ -391,15 +394,23 @@ namespace FIX_IT_Workshop
             selectedPanel.Visible = true;
         }
 
+        private void showNewUserPanel(Panel selected_userPanel)
+        {
+            //Add jou eie panels wat op Users is
+            pnlView_All_Users_panel.Visible = false;
+            pnlAdd_New_Users.Visible = false;
+            pnlUpdate_User_Details.Visible = false;
+            pnlRemove_Users.Visible = false;
+            pnlUsers.Visible = false;
+
+            selected_userPanel.Visible = true;
+        }
+
         private void Homepage_Load(object sender, EventArgs e)
         {
             tbcHomepage.SelectedTab = tbpAddCustomer;
             showNewCustomerPanel(pnlCustomerOptions);
             selectLabel(lblAddCustomer);
-        }
-        private void btnView_All_Users_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void cBUsers_SelectedIndexChanged(object sender, EventArgs e)
@@ -429,10 +440,64 @@ namespace FIX_IT_Workshop
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            txtFirst_Name.Clear();
-            txtLast_Name.Clear();
+            txtFirst_Name_View_All_Users_panel.Clear();
+            txtLast_Name_View_All_Users_panel.Clear();
 
-            cBUsers.SelectedIndex = -1;
+            cBUserType_View_All_Users_panel.SelectedIndex = -1;
         }
+
+        private void btnView_All_Users_Click_1(object sender, EventArgs e)
+        {
+            //tbcHomepage.SelectedTab = tbpUsers;
+            showNewUserPanel(pnlUsers);
+            pnlUsers.BringToFront();
+        }
+
+        //User Buttons
+
+        private void btnView_All_Users_Click_2(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlView_All_Users_panel);
+            pnlView_All_Users_panel.BringToFront();
+        }
+
+        private void btnRemove_Users_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlRemove_Users);
+            pnlRemove_Users.BringToFront();
+        }
+
+        private void btnUpdate_User_Details_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUpdate_User_Details);
+            pnlUpdate_User_Details.BringToFront();
+        }
+
+        private void btnAdd_New_Users_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlAdd_New_Users);
+            pnlAdd_New_Users.BringToFront();
+        }
+
+        private void btnCancel_View_All_Users_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btnCancel_Update_User_Details_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btnCancel_on_RemoveUser_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btn_Cancel_AddUsers_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+        //
     }
 }

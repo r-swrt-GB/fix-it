@@ -90,8 +90,8 @@ namespace FIX_IT_Workshop
         {
             bool validUser = false;
             int counter = 0;
-            string firstName = "John";
-            string lastName = "Doe";
+            string firstName = "";
+            string lastName = "";
             try
             {
                 //Assign new connection

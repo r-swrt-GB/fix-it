@@ -395,5 +395,42 @@ namespace FIX_IT_Workshop
             selectLabel(lblUsers);
         }
 
+        private void btnView_All_Users_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cBUsers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            /*if (cBUsers.SelectedIndex != -1)
+            {
+                if (cBUsers.SelectedValue == "Users")
+                {
+                    //Display all the data of the users
+                }
+                if (cBUsers.SelectedValue == "Mechanical Technicians")
+                {
+                    //Display all the data of the mechanical technicians
+                }
+            }*/
+        }
+
+        private void txtFirst_Name_TextChanged(object sender, EventArgs e)
+        {
+            //Live filter the database with the FirstName
+        }
+
+        private void txtLast_Name_TextChanged(object sender, EventArgs e)
+        {
+            //Live filter the database with the LastName
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtFirst_Name.Clear();
+            txtLast_Name.Clear();
+
+            cBUsers.SelectedIndex = -1;
+        }
     }
 }

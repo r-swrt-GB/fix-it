@@ -127,7 +127,7 @@ namespace FIX_IT_Workshop
                     // Execute command
                     dataReader = command.ExecuteReader();
 
-                    if (dataReader.Read())
+                    while (dataReader.Read())
                     {
                         if (dataReader.GetValue(1).ToString() == username)
                         {
@@ -148,6 +148,9 @@ namespace FIX_IT_Workshop
                         conn.Close();
                     }
                 }
+
+                //TODO: REMOVE LINE BELOW BEFORE SUMBITING!!!
+                validUser = true;
 
                 if (validUser)
                 {
@@ -179,6 +182,9 @@ namespace FIX_IT_Workshop
             //Check if user has entered all values
             bool isValidated = validateForm();
 
+
+            //TODO: REMOVE LINE BELOW BEFORE SUMBITING!!!
+            isValidated = true;
             if (isValidated)
             {
                 //Attempt to log user in

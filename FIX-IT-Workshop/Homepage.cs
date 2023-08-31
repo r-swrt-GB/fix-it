@@ -127,8 +127,10 @@ namespace FIX_IT_Workshop
 
         private void lblShop_Click(object sender, EventArgs e)
         {
-            tbcHomepage.SelectedTab = tbpStock;
+            tbcHomepage.SelectedTab = tbpShop;
+            showNewSalesPanel(pnlSaleChoice);
             selectLabel(lblShop);
+            
         }
 
         private void lblBookings_Click(object sender, EventArgs e)
@@ -951,6 +953,151 @@ namespace FIX_IT_Workshop
         private void txtCustomerEmailFilter_TextChanged(object sender, EventArgs e)
         {
             filterRecords($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client WHERE UPPER(First_Name) LIKE '%{txtCustomerFirstNameFilter.Text.ToUpper()}%' AND UPPER(Last_Name) LIKE '%{txtCustomerLastNameFilter.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{txtCustomerEmailFilter.Text.ToUpper()}%' AND UPPER(Contact_Number) LIKE '%{txtCustomerContactNumberFilter.Text.ToUpper()}%'", dgvViewAllCustomers);
+        }
+
+        private void showNewSalesPanel(Panel selectedPanel)
+        {
+            pnlSaleChoice.Visible = false;
+            pnlServices.Visible = false;
+            pnlRepair.Visible = false;
+            pnlMakePurcahes.Visible = false;
+            pnlViewTransaction.Visible = false;
+            pnlChangeSale.Visible = false;
+            pnlOrderStock.Visible = false;
+
+            selectedPanel.Visible = true;
+        }
+
+        private void returnToSales()
+        {
+            showNewSalesPanel(pnlSaleChoice);
+            pnlSaleChoice.BringToFront();
+        }
+
+        private void btnViewTransactionCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnServiceCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnPurchaseCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnPurchaseMakePurchase_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnChangeSaleCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnOrderStockCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnRepairCancel_Click(object sender, EventArgs e)
+        {
+            returnToSales();
+        }
+
+        private void btnNavService_Click_1(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlServices);
+            pnlServices.BringToFront();
+        }
+
+        private void btnNavOrderFromSupplier_Click_1(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlOrderStock);
+            pnlOrderStock.BringToFront();
+        }
+
+        private void btnNavChangeSales_Click(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlChangeSale);
+            pnlChangeSale.BringToFront();
+        }
+
+        private void btnNavTransaction_Click_1(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlViewTransaction);
+            pnlViewTransaction.BringToFront();
+        }
+
+        private void btnNavRepair_Click_1(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlRepair);
+            pnlRepair.BringToFront();
+        }
+
+        private void btnNavSell_Click_1(object sender, EventArgs e)
+        {
+            showNewSalesPanel(pnlMakePurcahes);
+            pnlMakePurcahes.BringToFront();
+        }
+
+        private void updateRecord(string sql, string firstName, string lastName, string email, string contactNumber)
+        {
+           
+                try
+                {
+                    
+
+                    //Open Connection
+                    if (conn.State != ConnectionState.Open)
+                    {
+                        conn.Open();
+                    }
+
+                   
+
+                    //Initialize new command
+                    command = new SqlCommand($"UPDATE Client SET FullName = '{fullName}', Email = '{email}', ContactNumber = '{contactNumber}', Username = '{username}', Type = '{userType}' WHERE UserId = {txtUserId.Text}", conn);
+
+                    //Initialzie dataAdapter
+                    dataAdapter = new SqlDataAdapter();
+
+                    //Execute statement
+                    dataAdapter.UpdateCommand = command;
+                    dataAdapter.UpdateCommand.ExecuteNonQuery();
+
+                    //Close connection
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+
+                    //Show suitable success message
+                    MessageBox.Show($"Your changes has successfully been saved, {txtFullName.Text}!");
+                }
+                catch (SqlException sqlException)
+                {
+                    //Show suitable error message
+                    MessageBox.Show("Failed to save changes.\nPlease try again later.");
+
+                    //Close connection
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+
+                    Console.WriteLine($"Error: {sqlException.Message}");
+                }
+            }
+        
+
+        private void btnUpdateCustomerDetailsConfirm_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

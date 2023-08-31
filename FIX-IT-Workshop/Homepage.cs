@@ -15,6 +15,10 @@ namespace FIX_IT_Workshop
     {
         Color selectedLabelColour = Color.FromArgb(180, 184, 171);
         Label currentlySelectedLabel;
+       
+        private SqlDataAdapter adap;
+        private DataSet ds;
+        public string connstr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|FixItDatabase.mdf;Integrated Security=True";
 
         //Declare SqlControls
         private SqlConnection conn;
@@ -58,7 +62,7 @@ namespace FIX_IT_Workshop
         public void resetAllLabels()
         {
             lblAddCustomer.ForeColor = Color.White;
-            lblBookings.ForeColor = Color.White;
+            lblSupplier.ForeColor = Color.White;
             lblShop.ForeColor = Color.White;
             lblStock.ForeColor = Color.White;
             lblLogOut.ForeColor = Color.White;
@@ -130,7 +134,18 @@ namespace FIX_IT_Workshop
         private void lblBookings_Click(object sender, EventArgs e)
         {
             tbcHomepage.SelectedTab = tbpBookings;
-            selectLabel(lblBookings);
+            selectLabel(lblSupplier);
+            conn = new SqlConnection(connstr);
+            conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            string sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
         }
 
         private void lblOrders_Click(object sender, EventArgs e)
@@ -167,12 +182,12 @@ namespace FIX_IT_Workshop
 
         private void lblBookings_MouseEnter(object sender, EventArgs e)
         {
-            selectLabel(lblBookings);
+            selectLabel(lblSupplier);
         }
 
         private void lblBookings_MouseLeave(object sender, EventArgs e)
         {
-            deselectLabel(lblBookings);
+            deselectLabel(lblSupplier);
         }
 
         private void lblOrders_MouseEnter(object sender, EventArgs e)
@@ -621,7 +636,10 @@ namespace FIX_IT_Workshop
 
         private void label6_Click(object sender, EventArgs e)
         {
+            //tbcHomepage is a TabControl 
+
             tbcHomepage.SelectedTab = tbpUsers;
+            showNewUserPanel(pnlUsers);
             selectLabel(lblUsers);
         }
 
@@ -638,6 +656,18 @@ namespace FIX_IT_Workshop
             selectedPanel.Visible = true;
         }
 
+        private void showNewUserPanel(Panel selected_userPanel)
+        {
+            //Add jou eie panels wat op Users is
+            pnlView_All_Users_panel.Visible = false;
+            pnlAdd_New_Users.Visible = false;
+            pnlUpdate_User_Details.Visible = false;
+            pnlRemove_Users.Visible = false;
+            pnlUsers.Visible = false;
+
+            selected_userPanel.Visible = true;
+        }
+
         private void Homepage_Load(object sender, EventArgs e)
         {
             connectDatabase();
@@ -645,6 +675,200 @@ namespace FIX_IT_Workshop
             showNewCustomerPanel(pnlCustomerOptions);
             selectLabel(lblAddCustomer);
         }
+
+        private void cBUsers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            /*if (cBUsers.SelectedIndex != -1)
+            {
+                if (cBUsers.SelectedValue == "Users")
+                {
+                    //Display all the data of the users
+                }
+                if (cBUsers.SelectedValue == "Mechanical Technicians")
+                {
+                    //Display all the data of the mechanical technicians
+                }
+            }*/
+        }
+
+        private void txtFirst_Name_TextChanged(object sender, EventArgs e)
+        {
+            //Live filter the database with the FirstName
+        }
+
+        private void txtLast_Name_TextChanged(object sender, EventArgs e)
+        {
+            //Live filter the database with the LastName
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtFirst_Name_View_All_Users_panel.Clear();
+            txtLast_Name_View_All_Users_panel.Clear();
+
+            cBUserType_View_All_Users_panel.SelectedIndex = -1;
+        }
+
+        private void btnView_All_Users_Click_1(object sender, EventArgs e)
+        {
+            //tbcHomepage.SelectedTab = tbpUsers;
+            showNewUserPanel(pnlUsers);
+            pnlUsers.BringToFront();
+        }
+
+        //User Buttons
+
+        private void btnView_All_Users_Click_2(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlView_All_Users_panel);
+            pnlView_All_Users_panel.BringToFront();
+        }
+
+        private void btnRemove_Users_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlRemove_Users);
+            pnlRemove_Users.BringToFront();
+        }
+
+        private void btnUpdate_User_Details_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUpdate_User_Details);
+            pnlUpdate_User_Details.BringToFront();
+        }
+
+        private void btnAdd_New_Users_Click_1(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlAdd_New_Users);
+            pnlAdd_New_Users.BringToFront();
+        }
+
+        private void btnCancel_View_All_Users_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btnCancel_Update_User_Details_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btnCancel_on_RemoveUser_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btn_Cancel_AddUsers_panel_Click(object sender, EventArgs e)
+        {
+            showNewUserPanel(pnlUsers);
+        }
+
+        private void btnAddSupp_Click(object sender, EventArgs e)
+        {
+            conn = new SqlConnection(connstr);
+            conn.Open();
+            
+            ds = new DataSet();
+            string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
+            command = new SqlCommand(sql, conn);
+            SqlDataAdapter adap = new SqlDataAdapter();
+            adap.InsertCommand = command;
+            adap.InsertCommand.ExecuteNonQuery();
+           // conn.Close();
+            tbCNumberSupp.Clear();
+            tbEmailSupp.Clear();
+            tbNameSupp.Clear();
+           // conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            conn = new SqlConnection(connstr);
+            conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+
+        private void btnDeleteSupp_Click(object sender, EventArgs e)
+        {
+            conn = new SqlConnection(connstr);
+            conn.Open();
+
+            ds = new DataSet();
+            string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[dgvSupp.CurrentRow.Index,0].Value}'";
+            
+            command = new SqlCommand(sql, conn);
+            SqlDataAdapter adap = new SqlDataAdapter();
+            adap.InsertCommand = command;
+            adap.InsertCommand.ExecuteNonQuery();
+            // conn.Close();
+            tbCNumberSupp.Clear();
+            tbEmailSupp.Clear();
+            tbNameSupp.Clear();
+            // conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+
+        private void btnClearFilterSupp_Click(object sender, EventArgs e)
+        {
+            tbCNumberSupp.Clear();
+            tbEmailSupp.Clear();
+            tbNameSupp.Clear();
+        }
+
+        private void tbEmailSupp_TextChanged(object sender, EventArgs e)
+        {
+            conn = new SqlConnection(connstr);
+            conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+
+        private void tbCNumberSupp_TextChanged(object sender, EventArgs e)
+        {
+            conn = new SqlConnection(connstr);
+            conn.Open();
+            adap = new SqlDataAdapter();
+            ds = new DataSet();
+            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
+            command = new SqlCommand(sql, conn);
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+        //
 
         private void txtDeleteCustomerFirstName_TextChanged(object sender, EventArgs e)
         {

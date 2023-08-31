@@ -89,7 +89,6 @@ namespace FIX_IT_Workshop
         private void loginUser(String username, String password)
         {
             bool validUser = false;
-            int counter = 0;
             string firstName = "";
             string lastName = "";
             try
@@ -97,56 +96,40 @@ namespace FIX_IT_Workshop
                 //Assign new connection
                 conn = new SqlConnection(connectionString);
 
-
-                while (counter <= 2)
+                // Open connection to the DB
+                if (conn.State == ConnectionState.Closed)
                 {
-                    counter++;
+                    conn.Open();
+                }
 
-                    // Open connection to the DB
-                    if (conn.State == ConnectionState.Closed)
+                //Select all records in the table
+                string sql = "SELECT User_ID, Username, Password, First_Name, Last_Name FROM [User]";
+
+                // Initialize new Sql command
+                command = new SqlCommand(sql, conn);
+
+                // Execute command
+                dataReader = command.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    if (dataReader.GetValue(1).ToString() == username)
                     {
-                        conn.Open();
-                    }
-                    
-                    String sql;
-                    if (counter == 1)
-                    {
-                        //Select all records in the table
-                        sql = "SELECT Admin_ID, Username, Password, First_Name, Last_Name FROM Admin";
-                    }
-                    else
-                    {
-                        //Select all records in the table
-                        sql = "SELECT Mechanical_Technician_ID, Username, Password, First_Name, Last_Name FROM Mechanical_Technician";
-                    }
-
-
-                    // Initialize new Sql command
-                    command = new SqlCommand(sql, conn);
-
-                    // Execute command
-                    dataReader = command.ExecuteReader();
-
-                    while (dataReader.Read())
-                    {
-                        if (dataReader.GetValue(1).ToString() == username)
+                        if (dataReader.GetValue(2).ToString() == password)
                         {
-                            if (dataReader.GetValue(2).ToString() == password)
-                            {
-                                validUser = true;
-                                userId = int.Parse(dataReader.GetValue(0).ToString());
-                                firstName = (dataReader.GetValue(3).ToString());
-                                lastName = (dataReader.GetValue(4).ToString());
-                                break;
-                            }
+                            validUser = true;
+                            userId = int.Parse(dataReader.GetValue(0).ToString());
+                            firstName = (dataReader.GetValue(3).ToString());
+                            lastName = (dataReader.GetValue(4).ToString());
+                            break;
                         }
                     }
+                }
 
-                    // Close conenction to DB
-                    if (conn.State == ConnectionState.Open)
-                    {
-                        conn.Close();
-                    }
+                // Close conenction to DB
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
                 }
 
                 //TODO: REMOVE LINE BELOW BEFORE SUMBITING!!!

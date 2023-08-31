@@ -28,6 +28,7 @@ namespace FIX_IT_Workshop
             lblStock.ForeColor = Color.White;
             lblLogOut.ForeColor = Color.White;
             lblOrders.ForeColor = Color.White;
+            lblUsers.ForeColor = Color.White;
         }
 
         public void selectLabel(Label selectedLabel)
@@ -387,5 +388,12 @@ namespace FIX_IT_Workshop
             pnlCustomerOptions.Visible = false;
             pnlUpdateCustomerDetails.BringToFront();
         }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+            tbcHomepage.SelectedTab = tbpUsers;
+            selectLabel(lblUsers);
+        }
+
     }
 }

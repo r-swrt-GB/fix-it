@@ -152,7 +152,7 @@ namespace FIX_IT_Workshop
                 if (validUser)
                 {
                     // Display suitable error dialog
-                    MessageBox.Show($"Login successful.\nWelcome back " + firstName + " "+ lastName + "!");
+                    MessageBox.Show($"Login successful.\nWelcome back " + firstName + " " + lastName + "!");
                     showHomePage();
                 }
                 else

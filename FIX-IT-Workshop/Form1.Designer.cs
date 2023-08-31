@@ -56,7 +56,7 @@ namespace FIX_IT_Workshop
             this.panel2.Controls.Add(this.btnLogIn);
             this.panel2.Controls.Add(this.txtPassword);
             this.panel2.Controls.Add(this.txtUsername);
-            this.panel2.Location = new System.Drawing.Point(4, 186);
+            this.panel2.Location = new System.Drawing.Point(15, 180);
             this.panel2.Margin = new System.Windows.Forms.Padding(6);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(544, 409);
@@ -80,7 +80,7 @@ namespace FIX_IT_Workshop
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.Black;
-            this.label5.Location = new System.Drawing.Point(38, 142);
+            this.label5.Location = new System.Drawing.Point(65, 142);
             this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(103, 25);
@@ -104,7 +104,7 @@ namespace FIX_IT_Workshop
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.Black;
-            this.label4.Location = new System.Drawing.Point(38, 227);
+            this.label4.Location = new System.Drawing.Point(65, 227);
             this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(97, 25);
@@ -127,7 +127,7 @@ namespace FIX_IT_Workshop
             // txtPassword
             // 
             this.txtPassword.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPassword.Location = new System.Drawing.Point(147, 224);
+            this.txtPassword.Location = new System.Drawing.Point(197, 224);
             this.txtPassword.Margin = new System.Windows.Forms.Padding(6);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
@@ -137,7 +137,7 @@ namespace FIX_IT_Workshop
             // txtUsername
             // 
             this.txtUsername.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtUsername.Location = new System.Drawing.Point(148, 139);
+            this.txtUsername.Location = new System.Drawing.Point(198, 139);
             this.txtUsername.Margin = new System.Windows.Forms.Padding(6);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(293, 33);
@@ -170,9 +170,10 @@ namespace FIX_IT_Workshop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 761);
+            this.ClientSize = new System.Drawing.Size(1155, 687);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";

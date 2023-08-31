@@ -1061,7 +1061,7 @@ namespace FIX_IT_Workshop
                    
 
                     //Initialize new command
-                    command = new SqlCommand($"UPDATE Client SET FullName = '{fullName}', Email = '{email}', ContactNumber = '{contactNumber}', Username = '{username}', Type = '{userType}' WHERE UserId = {txtUserId.Text}", conn);
+                    command = new SqlCommand($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}'", conn);
 
                     //Initialzie dataAdapter
                     dataAdapter = new SqlDataAdapter();
@@ -1077,7 +1077,7 @@ namespace FIX_IT_Workshop
                     }
 
                     //Show suitable success message
-                    MessageBox.Show($"Your changes has successfully been saved, {txtFullName.Text}!");
+                    MessageBox.Show($"Your changes has successfully been saved.");
                 }
                 catch (SqlException sqlException)
                 {

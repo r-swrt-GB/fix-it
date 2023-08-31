@@ -30,10 +30,11 @@ namespace FIX_IT_Workshop
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Homepage));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlMenu = new System.Windows.Forms.Panel();
             this.lblUsers = new System.Windows.Forms.Label();
             this.lblStock = new System.Windows.Forms.Label();
-            this.lblBookings = new System.Windows.Forms.Label();
+            this.lblSupplier = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblShop = new System.Windows.Forms.Label();
             this.lblAddCustomer = new System.Windows.Forms.Label();
@@ -159,6 +160,32 @@ namespace FIX_IT_Workshop
             this.btnRemove_Users = new System.Windows.Forms.Button();
             this.btnUpdate_User_Details = new System.Windows.Forms.Button();
             this.btnAdd_New_Users = new System.Windows.Forms.Button();
+            this.pnlView_All_Users = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.dGVDiplay_Users = new System.Windows.Forms.DataGridView();
+            this.cBUsers = new System.Windows.Forms.ComboBox();
+            this.btnClear = new System.Windows.Forms.Button();
+            this.lblFirst_Name = new System.Windows.Forms.Label();
+            this.txtFirst_Name = new System.Windows.Forms.TextBox();
+            this.lblLast_Name = new System.Windows.Forms.Label();
+            this.txtLast_Name = new System.Windows.Forms.TextBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.pnlSupplier = new System.Windows.Forms.Panel();
+            this.btnClearFilterSupp = new System.Windows.Forms.Button();
+
+            this.dgvSupp = new System.Windows.Forms.DataGridView();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.tbCNumberSupp = new System.Windows.Forms.TextBox();
+            this.tbEmailSupp = new System.Windows.Forms.TextBox();
+            this.tbNameSupp = new System.Windows.Forms.TextBox();
+            this.btnDeleteSupp = new System.Windows.Forms.Button();
+            this.btnAddSupp = new System.Windows.Forms.Button();
+            this.btnUpdateSupp = new System.Windows.Forms.Button();
             this.pnlUpdate_User_Details = new System.Windows.Forms.Panel();
             this.label14 = new System.Windows.Forms.Label();
             this.txtNewPassword_Update_User_Details_panel = new System.Windows.Forms.TextBox();
@@ -211,11 +238,16 @@ namespace FIX_IT_Workshop
             ((System.ComponentModel.ISupportInitialize)(this.dgvViewAllVehicles)).BeginInit();
             this.pnlUpdateCustomerDetails.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUpdateCustomerDetails)).BeginInit();
+            this.tbpBookings.SuspendLayout();
             this.tbpUsers.SuspendLayout();
             this.pnlView_All_Users_panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dGVDisplay_Users_View_All_Users_panel)).BeginInit();
             this.pnlRemove_Users.SuspendLayout();
             this.pnlUsers.SuspendLayout();
+            this.pnlView_All_Users.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dGVDiplay_Users)).BeginInit();
+            this.pnlSupplier.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSupp)).BeginInit();
             this.pnlUpdate_User_Details.SuspendLayout();
             this.pnlAdd_New_Users.SuspendLayout();
             this.SuspendLayout();
@@ -226,7 +258,7 @@ namespace FIX_IT_Workshop
             this.pnlMenu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pnlMenu.BackgroundImage")));
             this.pnlMenu.Controls.Add(this.lblUsers);
             this.pnlMenu.Controls.Add(this.lblStock);
-            this.pnlMenu.Controls.Add(this.lblBookings);
+            this.pnlMenu.Controls.Add(this.lblSupplier);
             this.pnlMenu.Controls.Add(this.label3);
             this.pnlMenu.Controls.Add(this.lblShop);
             this.pnlMenu.Controls.Add(this.lblAddCustomer);
@@ -278,22 +310,22 @@ namespace FIX_IT_Workshop
             this.lblStock.MouseEnter += new System.EventHandler(this.lblStock_MouseEnter);
             this.lblStock.MouseLeave += new System.EventHandler(this.lblStock_MouseLeave);
             // 
-            // lblBookings
+            // lblSupplier
             // 
-            this.lblBookings.AutoSize = true;
-            this.lblBookings.BackColor = System.Drawing.Color.Transparent;
-            this.lblBookings.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblBookings.Font = new System.Drawing.Font("Yu Gothic UI", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBookings.ForeColor = System.Drawing.Color.White;
-            this.lblBookings.Location = new System.Drawing.Point(28, 498);
-            this.lblBookings.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lblBookings.Name = "lblBookings";
-            this.lblBookings.Size = new System.Drawing.Size(188, 40);
-            this.lblBookings.TabIndex = 17;
-            this.lblBookings.Text = "🔧 Bookings";
-            this.lblBookings.Click += new System.EventHandler(this.lblBookings_Click);
-            this.lblBookings.MouseEnter += new System.EventHandler(this.lblBookings_MouseEnter);
-            this.lblBookings.MouseLeave += new System.EventHandler(this.lblBookings_MouseLeave);
+            this.lblSupplier.AutoSize = true;
+            this.lblSupplier.BackColor = System.Drawing.Color.Transparent;
+            this.lblSupplier.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblSupplier.Font = new System.Drawing.Font("Yu Gothic UI", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSupplier.ForeColor = System.Drawing.Color.White;
+            this.lblSupplier.Location = new System.Drawing.Point(28, 498);
+            this.lblSupplier.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblSupplier.Name = "lblSupplier";
+            this.lblSupplier.Size = new System.Drawing.Size(175, 40);
+            this.lblSupplier.TabIndex = 17;
+            this.lblSupplier.Text = "🔧 Supplier";
+            this.lblSupplier.Click += new System.EventHandler(this.lblBookings_Click);
+            this.lblSupplier.MouseEnter += new System.EventHandler(this.lblBookings_MouseEnter);
+            this.lblSupplier.MouseLeave += new System.EventHandler(this.lblBookings_MouseLeave);
             // 
             // label3
             // 
@@ -1499,6 +1531,7 @@ namespace FIX_IT_Workshop
             // 
             // tbpBookings
             // 
+            this.tbpBookings.Controls.Add(this.pnlSupplier);
             this.tbpBookings.Location = new System.Drawing.Point(4, 22);
             this.tbpBookings.Name = "tbpBookings";
             this.tbpBookings.Size = new System.Drawing.Size(887, 544);
@@ -1950,6 +1983,19 @@ namespace FIX_IT_Workshop
             // 
             // txtContactNumber_Update_User_Details_panel
             // 
+            this.pnlView_All_Users.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlView_All_Users.Controls.Add(this.lblLast_Name);
+            this.pnlView_All_Users.Controls.Add(this.txtLast_Name);
+            this.pnlView_All_Users.Controls.Add(this.cBUsers);
+            this.pnlView_All_Users.Controls.Add(this.lblFirst_Name);
+            this.pnlView_All_Users.Controls.Add(this.txtFirst_Name);
+            this.pnlView_All_Users.Controls.Add(this.btnClear);
+            this.pnlView_All_Users.Controls.Add(this.button1);
+            this.pnlView_All_Users.Controls.Add(this.dGVDiplay_Users);
+            this.pnlView_All_Users.Location = new System.Drawing.Point(18, 12);
+            this.pnlView_All_Users.Name = "pnlView_All_Users";
+            this.pnlView_All_Users.Size = new System.Drawing.Size(850, 520);
+            this.pnlView_All_Users.TabIndex = 18;
             this.txtContactNumber_Update_User_Details_panel.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtContactNumber_Update_User_Details_panel.Location = new System.Drawing.Point(203, 171);
             this.txtContactNumber_Update_User_Details_panel.Margin = new System.Windows.Forms.Padding(6);
@@ -1959,6 +2005,16 @@ namespace FIX_IT_Workshop
             // 
             // txtEmail_Update_User_Details_panel
             // 
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.button1.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(90, 471);
+            this.button1.Margin = new System.Windows.Forms.Padding(6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(138, 40);
+            this.button1.TabIndex = 20;
+            this.button1.Text = "Cancel";
+            this.button1.UseVisualStyleBackColor = true;
+           
             this.txtEmail_Update_User_Details_panel.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtEmail_Update_User_Details_panel.Location = new System.Drawing.Point(206, 220);
             this.txtEmail_Update_User_Details_panel.Margin = new System.Windows.Forms.Padding(6);
@@ -1968,6 +2024,7 @@ namespace FIX_IT_Workshop
             // 
             // label12
             // 
+            // dGVDiplay_Users
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ForeColor = System.Drawing.Color.Black;
@@ -2221,6 +2278,153 @@ namespace FIX_IT_Workshop
             this.txtFirstName_AddUsers_panel.Size = new System.Drawing.Size(186, 33);
             this.txtFirstName_AddUsers_panel.TabIndex = 25;
             // 
+            // pnlSupplier
+            // 
+            this.pnlSupplier.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlSupplier.Controls.Add(this.btnUpdateSupp);
+            this.pnlSupplier.Controls.Add(this.btnAddSupp);
+            this.pnlSupplier.Controls.Add(this.btnClearFilterSupp);
+            this.pnlSupplier.Controls.Add(this.dgvSupp);
+            this.pnlSupplier.Controls.Add(this.label7);
+            this.pnlSupplier.Controls.Add(this.label8);
+            this.pnlSupplier.Controls.Add(this.label10);
+            this.pnlSupplier.Controls.Add(this.tbCNumberSupp);
+            this.pnlSupplier.Controls.Add(this.tbEmailSupp);
+            this.pnlSupplier.Controls.Add(this.tbNameSupp);
+            this.pnlSupplier.Controls.Add(this.btnDeleteSupp);
+            this.pnlSupplier.Location = new System.Drawing.Point(-4, 4);
+            this.pnlSupplier.Name = "pnlSupplier";
+            this.pnlSupplier.Size = new System.Drawing.Size(895, 544);
+            this.pnlSupplier.TabIndex = 18;
+            // 
+            // btnClearFilterSupp
+            // 
+            this.btnClearFilterSupp.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnClearFilterSupp.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnClearFilterSupp.Location = new System.Drawing.Point(90, 188);
+            this.btnClearFilterSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.btnClearFilterSupp.Name = "btnClearFilterSupp";
+            this.btnClearFilterSupp.Size = new System.Drawing.Size(672, 40);
+            this.btnClearFilterSupp.TabIndex = 19;
+            this.btnClearFilterSupp.Text = "Clear Filter";
+            this.btnClearFilterSupp.UseVisualStyleBackColor = true;
+            this.btnClearFilterSupp.Click += new System.EventHandler(this.btnClearFilterSupp_Click);
+            // 
+            // dgvSupp
+            // 
+            this.dgvSupp.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvSupp.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvSupp.Location = new System.Drawing.Point(90, 276);
+            this.dgvSupp.Name = "dgvSupp";
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvSupp.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.dgvSupp.Size = new System.Drawing.Size(672, 186);
+            this.dgvSupp.TabIndex = 17;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.Color.Black;
+            this.label7.Location = new System.Drawing.Point(413, 79);
+            this.label7.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(160, 25);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Contact Number:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.ForeColor = System.Drawing.Color.Black;
+            this.label8.Location = new System.Drawing.Point(85, 79);
+            this.label8.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(64, 25);
+            this.label8.TabIndex = 15;
+            this.label8.Text = "Email:";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.ForeColor = System.Drawing.Color.Black;
+            this.label10.Location = new System.Drawing.Point(85, 20);
+            this.label10.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(144, 25);
+            this.label10.TabIndex = 13;
+            this.label10.Text = "Supplier Name:";
+            // 
+            // tbCNumberSupp
+            // 
+            this.tbCNumberSupp.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbCNumberSupp.Location = new System.Drawing.Point(588, 76);
+            this.tbCNumberSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.tbCNumberSupp.Name = "tbCNumberSupp";
+            this.tbCNumberSupp.Size = new System.Drawing.Size(174, 33);
+            this.tbCNumberSupp.TabIndex = 4;
+            this.tbCNumberSupp.TextChanged += new System.EventHandler(this.tbCNumberSupp_TextChanged);
+            // 
+            // tbEmailSupp
+            // 
+            this.tbEmailSupp.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbEmailSupp.Location = new System.Drawing.Point(169, 76);
+            this.tbEmailSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.tbEmailSupp.Name = "tbEmailSupp";
+            this.tbEmailSupp.Size = new System.Drawing.Size(223, 33);
+            this.tbEmailSupp.TabIndex = 3;
+            this.tbEmailSupp.TextChanged += new System.EventHandler(this.tbEmailSupp_TextChanged);
+            // 
+            // tbNameSupp
+            // 
+            this.tbNameSupp.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbNameSupp.Location = new System.Drawing.Point(231, 17);
+            this.tbNameSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.tbNameSupp.Name = "tbNameSupp";
+            this.tbNameSupp.Size = new System.Drawing.Size(161, 33);
+            this.tbNameSupp.TabIndex = 1;
+            this.tbNameSupp.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
+            // 
+            // btnDeleteSupp
+            // 
+            this.btnDeleteSupp.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnDeleteSupp.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDeleteSupp.Location = new System.Drawing.Point(90, 479);
+            this.btnDeleteSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.btnDeleteSupp.Name = "btnDeleteSupp";
+            this.btnDeleteSupp.Size = new System.Drawing.Size(294, 40);
+            this.btnDeleteSupp.TabIndex = 5;
+            this.btnDeleteSupp.Text = "Delete Selected Supplier";
+            this.btnDeleteSupp.UseVisualStyleBackColor = true;
+            this.btnDeleteSupp.Click += new System.EventHandler(this.btnDeleteSupp_Click);
+            // 
+            // btnAddSupp
+            // 
+            this.btnAddSupp.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnAddSupp.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddSupp.Location = new System.Drawing.Point(90, 136);
+            this.btnAddSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.btnAddSupp.Name = "btnAddSupp";
+            this.btnAddSupp.Size = new System.Drawing.Size(188, 40);
+            this.btnAddSupp.TabIndex = 21;
+            this.btnAddSupp.Text = "Add Supplier";
+            this.btnAddSupp.UseVisualStyleBackColor = true;
+            this.btnAddSupp.Click += new System.EventHandler(this.btnAddSupp_Click);
+            // 
+            // btnUpdateSupp
+            // 
+            this.btnUpdateSupp.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnUpdateSupp.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpdateSupp.Location = new System.Drawing.Point(475, 479);
+            this.btnUpdateSupp.Margin = new System.Windows.Forms.Padding(6);
+            this.btnUpdateSupp.Name = "btnUpdateSupp";
+            this.btnUpdateSupp.Size = new System.Drawing.Size(287, 40);
+            this.btnUpdateSupp.TabIndex = 22;
+            this.btnUpdateSupp.Text = "Update Selected Supplier";
+            this.btnUpdateSupp.UseVisualStyleBackColor = true;
+            // 
             // Homepage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2258,6 +2462,7 @@ namespace FIX_IT_Workshop
             this.pnlUpdateCustomerDetails.ResumeLayout(false);
             this.pnlUpdateCustomerDetails.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUpdateCustomerDetails)).EndInit();
+            this.tbpBookings.ResumeLayout(false);
             this.tbpUsers.ResumeLayout(false);
             this.pnlView_All_Users_panel.ResumeLayout(false);
             this.pnlView_All_Users_panel.PerformLayout();
@@ -2265,6 +2470,12 @@ namespace FIX_IT_Workshop
             this.pnlRemove_Users.ResumeLayout(false);
             this.pnlRemove_Users.PerformLayout();
             this.pnlUsers.ResumeLayout(false);
+            this.pnlView_All_Users.ResumeLayout(false);
+            this.pnlView_All_Users.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dGVDiplay_Users)).EndInit();
+            this.pnlSupplier.ResumeLayout(false);
+            this.pnlSupplier.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSupp)).EndInit();
             this.pnlUpdate_User_Details.ResumeLayout(false);
             this.pnlUpdate_User_Details.PerformLayout();
             this.pnlAdd_New_Users.ResumeLayout(false);
@@ -2277,7 +2488,7 @@ namespace FIX_IT_Workshop
 
         private System.Windows.Forms.Panel pnlMenu;
         private System.Windows.Forms.Label lblStock;
-        private System.Windows.Forms.Label lblBookings;
+        private System.Windows.Forms.Label lblSupplier;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblShop;
         private System.Windows.Forms.Label lblAddCustomer;
@@ -2404,17 +2615,38 @@ namespace FIX_IT_Workshop
         private System.Windows.Forms.Button btnRemove_Users;
         private System.Windows.Forms.Button btnUpdate_User_Details;
         private System.Windows.Forms.Button btnAdd_New_Users;
+        private System.Windows.Forms.Panel pnlView_All_Users;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.DataGridView dGVDiplay_Users;
+        private System.Windows.Forms.ComboBox cBUsers;
+        private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.TextBox txtLast_Name;
+        private System.Windows.Forms.TextBox txtFirst_Name;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Panel pnlSupplier;
+        private System.Windows.Forms.Button btnClearFilterSupp;
+        private System.Windows.Forms.DataGridView dgvSupp;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox tbCNumberSupp;
+        private System.Windows.Forms.TextBox tbEmailSupp;
+        private System.Windows.Forms.TextBox tbNameSupp;
+        private System.Windows.Forms.Button btnDeleteSupp;
+        private System.Windows.Forms.Button btnAddSupp;
+        private System.Windows.Forms.Button btnUpdateSupp;
         private System.Windows.Forms.Panel pnlUpdate_User_Details;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox txtNewPassword_Update_User_Details_panel;
         private System.Windows.Forms.Button btnClear_Update_User_Details_panel;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cBUserRole_Update_User_Details_panel;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox txtUsername_Update_User_Details_panel;
         private System.Windows.Forms.Button btnCancel_Update_User_Details_panel;
         private System.Windows.Forms.Button btnUpdate_User_Details_Update_User_Details_panel;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtContactNumber_Update_User_Details_panel;
         private System.Windows.Forms.TextBox txtEmail_Update_User_Details_panel;

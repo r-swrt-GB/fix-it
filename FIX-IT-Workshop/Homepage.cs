@@ -49,13 +49,7 @@ namespace FIX_IT_Workshop
         private void label7_Click(object sender, EventArgs e)
         {
             tbcHomepage.SelectedTab = tbpAddCustomer;
-            pnlCustomerOptions.Visible = true;
-            pnlUpdateCustomerDetails.Visible = false;
-            pnlCustomerDetails.Visible = false;
-            pnlViewAllVehicles.Visible = false;
-            pnlDeleteCustomer.Visible = false;
-            pnlCustomerViewAll.Visible = false;
-            pnlCustomerVehicleInfo.Visible = false;
+            showNewCustomerPanel(pnlCustomerOptions);
             selectLabel(lblAddCustomer);
         }
 
@@ -211,8 +205,7 @@ namespace FIX_IT_Workshop
 
         private void btnAddNewCustomer_Click_1(object sender, EventArgs e)
         {
-            pnlCustomerOptions.Visible = false;
-            pnlCustomerDetails.Visible = true;
+                      showNewCustomerPanel(pnlCustomerDetails);
             pnlCustomerDetails.BringToFront();
         }
 
@@ -220,9 +213,7 @@ namespace FIX_IT_Workshop
         {
             if (verifyCustomerDetails())
             {
-                pnlCustomerDetails.Visible = false;
-                pnlCustomerVehicleInfo.Visible = true;
-                pnlCustomerOptions.Visible = false;
+                showNewCustomerPanel(pnlCustomerVehicleInfo);
                 pnlCustomerVehicleInfo.BringToFront();
             }
             else
@@ -235,8 +226,7 @@ namespace FIX_IT_Workshop
         private void btnCancelAddCustomer_Click(object sender, EventArgs e)
         {
             clearCustomerDetailValues();
-            pnlCustomerDetails.Visible = false;
-            pnlCustomerOptions.Visible = true;
+            showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
 
@@ -261,9 +251,8 @@ namespace FIX_IT_Workshop
                 clearCustomerDetailValues();
                 clearCustomerVehcileDetails();
 
-                pnlCustomerVehicleInfo.Visible = false;
-                pnlCustomerDetails.Visible = false;
-                pnlCustomerOptions.Visible = true;
+              
+                showNewCustomerPanel(pnlCustomerOptions);
                 pnlCustomerOptions.BringToFront();
             }
             else
@@ -275,10 +264,10 @@ namespace FIX_IT_Workshop
 
         private void btnCustomerVehicleInfoBack_Click(object sender, EventArgs e)
         {
-            pnlCustomerVehicleInfo.Visible = false;
-            pnlCustomerDetails.Visible = true;
+            
             pnlCustomerDetails.BringToFront();
-            pnlCustomerOptions.Visible = false;
+          
+            showNewCustomerPanel(pnlCustomerDetails);
         }
 
         public void resetCustomerViewAllFilter()
@@ -309,36 +298,32 @@ namespace FIX_IT_Workshop
 
         private void btnDeleteCustomersBack_Click(object sender, EventArgs e)
         {
-            pnlDeleteCustomer.Visible = false;
-            pnlCustomerOptions.Visible = true;
+
+            showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
 
         private void btnViewAllCancel_Click(object sender, EventArgs e)
         {
-            pnlCustomerViewAll.Visible = false;
-            pnlCustomerOptions.Visible = true;
+            showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
 
         private void btnViewAllCustomers_Click(object sender, EventArgs e)
         {
-            pnlCustomerViewAll.Visible = true;
-            pnlCustomerOptions.Visible = false;
+            showNewCustomerPanel(pnlCustomerViewAll);
             pnlCustomerViewAll.BringToFront();
         }
 
         private void btnRemoveCustomer_Click(object sender, EventArgs e)
         {
-            pnlDeleteCustomer.Visible = true;
-            pnlCustomerOptions.Visible = false;
+            showNewCustomerPanel(pnlDeleteCustomer);
             pnlDeleteCustomer.BringToFront();
         }
 
         private void btnViewAllVehiclesCancel_Click(object sender, EventArgs e)
         {
-            pnlViewAllVehicles.Visible = false;
-            pnlCustomerOptions.Visible = true;
+            showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
 
@@ -357,15 +342,14 @@ namespace FIX_IT_Workshop
 
         private void btnViewAllVehicles_Click(object sender, EventArgs e)
         {
-            pnlViewAllVehicles.Visible = true;
-            pnlCustomerOptions.Visible = false;
+            showNewCustomerPanel(pnlViewAllVehicles);
             pnlViewAllVehicles.BringToFront();
         }
 
         private void btnUpdateCustomerDetailsCancel_Click(object sender, EventArgs e)
         {
-            pnlUpdateCustomerDetails.Visible = false;
-            pnlCustomerOptions.Visible = true;
+
+            showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
 
@@ -384,8 +368,7 @@ namespace FIX_IT_Workshop
 
         private void btnUpdateCustomerDetails_Click(object sender, EventArgs e)
         {
-            pnlUpdateCustomerDetails.Visible = true;
-            pnlCustomerOptions.Visible = false;
+            showNewCustomerPanel(pnlUpdateCustomerDetails);
             pnlUpdateCustomerDetails.BringToFront();
         }
 
@@ -395,5 +378,24 @@ namespace FIX_IT_Workshop
             selectLabel(lblUsers);
         }
 
+        private void showNewCustomerPanel(Panel selectedPanel)
+        {
+            pnlCustomerOptions.Visible = false;
+            pnlUpdateCustomerDetails.Visible = false;
+            pnlCustomerDetails.Visible = false;
+            pnlViewAllVehicles.Visible = false;
+            pnlDeleteCustomer.Visible = false;
+            pnlCustomerViewAll.Visible = false;
+            pnlCustomerVehicleInfo.Visible = false;
+
+            selectedPanel.Visible = true;
+        }
+
+        private void Homepage_Load(object sender, EventArgs e)
+        {
+            tbcHomepage.SelectedTab = tbpAddCustomer;
+            showNewCustomerPanel(pnlCustomerOptions);
+            selectLabel(lblAddCustomer);
+        }
     }
 }

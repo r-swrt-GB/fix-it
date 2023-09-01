@@ -783,109 +783,113 @@ namespace FIX_IT_Workshop
 
         private void btnAddSupp_Click(object sender, EventArgs e)
         {
+            try
+            {
+                conn = new SqlConnection(connstr);
+                conn.Open();
+
+                ds = new DataSet();
+                string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
+                command = new SqlCommand(sql, conn);
+                SqlDataAdapter adap = new SqlDataAdapter();
+                adap.InsertCommand = command;
+                adap.InsertCommand.ExecuteNonQuery();
+                // conn.Close();
+                tbCNumberSupp.Clear();
+                tbEmailSupp.Clear();
+                tbNameSupp.Clear();
+                // conn.Open();
+                adap = new SqlDataAdapter();
+                ds = new DataSet();
+                sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+                command = new SqlCommand(sql, conn);
+                adap.SelectCommand = command;
+                adap.Fill(ds, "Supplier");
+                dgvSupp.DataSource = ds;
+                dgvSupp.DataMember = "Supplier";
+                conn.Close();
+            }catch(SqlException sqlex)
+            {
+                MessageBox.Show(sqlex.ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)//Zohan
+        {
             conn = new SqlConnection(connstr);
             conn.Open();
-
+            adap = new SqlDataAdapter();
             ds = new DataSet();
-            string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
+            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%'";
             command = new SqlCommand(sql, conn);
-            SqlDataAdapter adap = new SqlDataAdapter();
-            adap.InsertCommand = command;
-            adap.InsertCommand.ExecuteNonQuery();
-            // conn.Close();
+            adap.SelectCommand = command;
+            adap.Fill(ds, "Supplier");
+            dgvSupp.DataSource = ds;
+            dgvSupp.DataMember = "Supplier";
+            conn.Close();
+        }
+
+        private void btnDeleteSupp_Click(object sender, EventArgs e)//Zohan
+        {
+            try
+            {
+                conn = new SqlConnection(connstr);
+                conn.Open();
+
+                ds = new DataSet();
+                string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[0,dgvSupp.CurrentRow.Index].Value}'";
+
+                command = new SqlCommand(sql, conn);
+                SqlDataAdapter adap = new SqlDataAdapter();
+                adap.InsertCommand = command;
+                adap.InsertCommand.ExecuteNonQuery();
+                // conn.Close();
+                tbCNumberSupp.Clear();
+                tbEmailSupp.Clear();
+                tbNameSupp.Clear();
+                // conn.Open();
+                adap = new SqlDataAdapter();
+                ds = new DataSet();
+                sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+                command = new SqlCommand(sql, conn);
+                adap.SelectCommand = command;
+                adap.Fill(ds, "Supplier");
+                dgvSupp.DataSource = ds;
+                dgvSupp.DataMember = "Supplier";
+                conn.Close();
+            }
+            catch (SqlException sqlex)
+            {
+                MessageBox.Show(sqlex.ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            
+                
+ 
+        }
+
+        private void btnClearFilterSupp_Click(object sender, EventArgs e)//Zohan
+        {
             tbCNumberSupp.Clear();
             tbEmailSupp.Clear();
             tbNameSupp.Clear();
-            // conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            sql = "SELECT Name,Contact_Number,Email FROM Supplier";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
         }
 
-        private void textBox4_TextChanged(object sender, EventArgs e)
+        private void tbEmailSupp_TextChanged(object sender, EventArgs e)//Zohan
         {
-            conn = new SqlConnection(connstr);
-            conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
+           
         }
 
-        private void btnDeleteSupp_Click(object sender, EventArgs e)
+        private void tbCNumberSupp_TextChanged(object sender, EventArgs e)//Zohan
         {
-            conn = new SqlConnection(connstr);
-            conn.Open();
-
-            ds = new DataSet();
-            string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[dgvSupp.CurrentRow.Index, 0].Value}'";
-
-            command = new SqlCommand(sql, conn);
-            SqlDataAdapter adap = new SqlDataAdapter();
-            adap.InsertCommand = command;
-            adap.InsertCommand.ExecuteNonQuery();
-            // conn.Close();
-            tbCNumberSupp.Clear();
-            tbEmailSupp.Clear();
-            tbNameSupp.Clear();
-            // conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            sql = "SELECT Name,Contact_Number,Email FROM Supplier";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
-        }
-
-        private void btnClearFilterSupp_Click(object sender, EventArgs e)
-        {
-            tbCNumberSupp.Clear();
-            tbEmailSupp.Clear();
-            tbNameSupp.Clear();
-        }
-
-        private void tbEmailSupp_TextChanged(object sender, EventArgs e)
-        {
-            conn = new SqlConnection(connstr);
-            conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
-        }
-
-        private void tbCNumberSupp_TextChanged(object sender, EventArgs e)
-        {
-            conn = new SqlConnection(connstr);
-            conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{tbEmailSupp.Text.ToUpper()}%' AND (Contact_Number) LIKE '%{tbCNumberSupp.Text}%'";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
+            
         }
         //
 
@@ -1369,7 +1373,7 @@ namespace FIX_IT_Workshop
             string year = txtUpdateCustomerVehicleDetailsFilledYear.Text;
             string licensePlate = txtUpdateCustomerVehicleDetailsFilledLicensePlate.Text;
 
-
+            //Update
             updateRecord($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}");
             updateRecord($"UPDATE Vehicle SET Make = '{make}', Model = '{model}', Year = '{year}', License_Plate_Number = '{licensePlate}' WHERE Client_ID = ${customerPrimaryKey}");
         }
@@ -1445,6 +1449,28 @@ namespace FIX_IT_Workshop
         private void btnDeleteCustomerClearFilter_Click(object sender, EventArgs e)
         {
             resetDeleteCustomerFilter();
+        }
+
+        private void btnUpdateSupp_Click(object sender, EventArgs e)//Zohan
+        {
+            //$"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}"
+            try
+            {
+                //MessageBox.Show(dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString());
+                updateRecord($"UPDATE Supplier SET Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}', Contact_Number = '{tbCNumberSupp.Text}', Email = '{tbEmailSupp.Text}' WHERE Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}'");
+               
+                tbEmailSupp.Clear();
+                tbNameSupp.Clear();
+                tbCNumberSupp.Clear();
+            }
+            catch (SqlException sqlex)
+            {
+                MessageBox.Show(sqlex.ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
     }
 }

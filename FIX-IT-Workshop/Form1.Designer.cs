@@ -39,9 +39,11 @@ namespace FIX_IT_Workshop
             this.txtPassword = new System.Windows.Forms.MaskedTextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.pbxApplicationClose = new System.Windows.Forms.PictureBox();
             this.pbxLogo = new System.Windows.Forms.PictureBox();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxApplicationClose)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxLogo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -57,7 +59,7 @@ namespace FIX_IT_Workshop
             this.panel2.Controls.Add(this.txtPassword);
             this.panel2.Controls.Add(this.txtUsername);
             this.panel2.Location = new System.Drawing.Point(15, 180);
-            this.panel2.Margin = new System.Windows.Forms.Padding(6);
+            this.panel2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(544, 409);
             this.panel2.TabIndex = 9;
@@ -67,7 +69,7 @@ namespace FIX_IT_Workshop
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnClear.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClear.Location = new System.Drawing.Point(148, 317);
-            this.btnClear.Margin = new System.Windows.Forms.Padding(6);
+            this.btnClear.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(120, 40);
             this.btnClear.TabIndex = 11;
@@ -116,7 +118,7 @@ namespace FIX_IT_Workshop
             this.btnLogIn.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnLogIn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLogIn.Location = new System.Drawing.Point(321, 317);
-            this.btnLogIn.Margin = new System.Windows.Forms.Padding(6);
+            this.btnLogIn.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnLogIn.Name = "btnLogIn";
             this.btnLogIn.Size = new System.Drawing.Size(120, 40);
             this.btnLogIn.TabIndex = 6;
@@ -128,7 +130,7 @@ namespace FIX_IT_Workshop
             // 
             this.txtPassword.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPassword.Location = new System.Drawing.Point(197, 224);
-            this.txtPassword.Margin = new System.Windows.Forms.Padding(6);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(294, 33);
@@ -138,7 +140,7 @@ namespace FIX_IT_Workshop
             // 
             this.txtUsername.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtUsername.Location = new System.Drawing.Point(198, 139);
-            this.txtUsername.Margin = new System.Windows.Forms.Padding(6);
+            this.txtUsername.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(293, 33);
             this.txtUsername.TabIndex = 4;
@@ -146,13 +148,29 @@ namespace FIX_IT_Workshop
             // panel1
             // 
             this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
+            this.panel1.Controls.Add(this.pbxApplicationClose);
             this.panel1.Controls.Add(this.pbxLogo);
             this.panel1.ForeColor = System.Drawing.Color.Black;
             this.panel1.Location = new System.Drawing.Point(574, -344);
-            this.panel1.Margin = new System.Windows.Forms.Padding(6);
+            this.panel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1107, 1448);
             this.panel1.TabIndex = 8;
+            // 
+            // pbxApplicationClose
+            // 
+            this.pbxApplicationClose.BackColor = System.Drawing.Color.Transparent;
+            this.pbxApplicationClose.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbxApplicationClose.BackgroundImage")));
+            this.pbxApplicationClose.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pbxApplicationClose.ErrorImage = null;
+            this.pbxApplicationClose.InitialImage = null;
+            this.pbxApplicationClose.Location = new System.Drawing.Point(520, 355);
+            this.pbxApplicationClose.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pbxApplicationClose.Name = "pbxApplicationClose";
+            this.pbxApplicationClose.Size = new System.Drawing.Size(51, 47);
+            this.pbxApplicationClose.TabIndex = 1;
+            this.pbxApplicationClose.TabStop = false;
+            this.pbxApplicationClose.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // pbxLogo
             // 
@@ -160,7 +178,7 @@ namespace FIX_IT_Workshop
             this.pbxLogo.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbxLogo.BackgroundImage")));
             this.pbxLogo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pbxLogo.Location = new System.Drawing.Point(59, 506);
-            this.pbxLogo.Margin = new System.Windows.Forms.Padding(6);
+            this.pbxLogo.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.pbxLogo.Name = "pbxLogo";
             this.pbxLogo.Size = new System.Drawing.Size(536, 446);
             this.pbxLogo.TabIndex = 0;
@@ -170,7 +188,7 @@ namespace FIX_IT_Workshop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1155, 687);
+            this.ClientSize = new System.Drawing.Size(1184, 761);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -181,6 +199,7 @@ namespace FIX_IT_Workshop
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbxApplicationClose)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxLogo)).EndInit();
             this.ResumeLayout(false);
 
@@ -198,6 +217,7 @@ namespace FIX_IT_Workshop
         private System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pbxLogo;
+        private System.Windows.Forms.PictureBox pbxApplicationClose;
     }
 }
 

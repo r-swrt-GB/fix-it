@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace FIX_IT_Workshop
 {
@@ -15,7 +10,7 @@ namespace FIX_IT_Workshop
     {
         Color selectedLabelColour = Color.FromArgb(180, 184, 171);
         Label currentlySelectedLabel;
-       
+
         private SqlDataAdapter adap;
         private DataSet ds;
         public string connstr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|FixItDatabase.mdf;Integrated Security=True";
@@ -27,6 +22,7 @@ namespace FIX_IT_Workshop
         private SqlDataAdapter dataAdapter;
 
         int userId;
+        int customerPrimaryKey = -1;
 
         //Declare connectionString global
         public String connectionString;
@@ -130,7 +126,7 @@ namespace FIX_IT_Workshop
             tbcHomepage.SelectedTab = tbpShop;
             showNewSalesPanel(pnlSaleChoice);
             selectLabel(lblShop);
-            
+
         }
 
         private void lblBookings_Click(object sender, EventArgs e)
@@ -311,7 +307,7 @@ namespace FIX_IT_Workshop
                 command.Parameters.AddWithValue("@last_name", lastName);
                 command.Parameters.AddWithValue("@email", email);
                 command.Parameters.AddWithValue("@contact_number", contactNumber);
-                
+
 
 
                 command.ExecuteNonQuery();
@@ -325,7 +321,7 @@ namespace FIX_IT_Workshop
                     conn.Close();
                 }
 
-               
+
             }
             catch (SqlException sqlException)
             {
@@ -365,7 +361,7 @@ namespace FIX_IT_Workshop
                 command.Parameters.AddWithValue("@lisence_plate_number", licensePlateNumber);
                 command.ExecuteNonQuery();
 
-               
+
 
                 //Close connection
                 if (conn.State == ConnectionState.Open)
@@ -392,43 +388,10 @@ namespace FIX_IT_Workshop
             }
         }
 
-        private void btnCustomerVehicleInfoFinish_Click(object sender, EventArgs e)
-        {
-            if (verifyVehicleDetails())
-            {
-                string firstName = txtCustomerFirstName.Text;
-                string lastName = txtCustomerLastName.Text;
-                string email = txtCustomerEmail.Text;
-                string contactNumber = txtCustomerContactNumber.Text;
-
-                string make = txtCustomerVehicleMake.Text;
-                string model = txtCustomerVehicleModel.Text;
-                string year = txtCustomerVehicleYear.Text;
-                string licensePlate = txtCustomerVehicleLicensePlate.Text;
-
-                int vehicleId = addVehicle(make, model, year, licensePlate);
-                addUser(firstName, lastName, email, contactNumber, vehicleId);
-
-                clearCustomerDetailValues();
-                clearCustomerVehcileDetails();
-
-              
-                showNewCustomerPanel(pnlCustomerOptions);
-                pnlCustomerOptions.BringToFront();
-            }
-            else
-            {
-                //Display appropiate message to the user
-                MessageBox.Show($"Please fill out all fields before continuing.");
-            }
-        }
-
+        
         private void btnCustomerVehicleInfoBack_Click(object sender, EventArgs e)
         {
-            
-            pnlCustomerDetails.BringToFront();
-          
-            showNewCustomerPanel(pnlCustomerDetails);
+
         }
 
         public void resetCustomerViewAllFilter()
@@ -631,8 +594,9 @@ namespace FIX_IT_Workshop
 
         private void btnUpdateCustomerDetails_Click(object sender, EventArgs e)
         {
+            btnUpdateCustomerDetailsConfirm.Enabled = false;
             showNewCustomerPanel(pnlUpdateCustomerDetails);
-            executeDisplaySql($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client", dgvUpdateCustomerDetails); 
+            executeDisplaySql($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client", dgvUpdateCustomerDetails);
             pnlUpdateCustomerDetails.BringToFront();
         }
 
@@ -654,6 +618,8 @@ namespace FIX_IT_Workshop
             pnlDeleteCustomer.Visible = false;
             pnlCustomerViewAll.Visible = false;
             pnlCustomerVehicleInfo.Visible = false;
+            pnlUpdateCustomerDetailsFilled.Visible = false;
+            pnlUpdateCustomerVehicleDetailsFilled.Visible = false;
 
             selectedPanel.Visible = true;
         }
@@ -768,18 +734,18 @@ namespace FIX_IT_Workshop
         {
             conn = new SqlConnection(connstr);
             conn.Open();
-            
+
             ds = new DataSet();
             string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
             command = new SqlCommand(sql, conn);
             SqlDataAdapter adap = new SqlDataAdapter();
             adap.InsertCommand = command;
             adap.InsertCommand.ExecuteNonQuery();
-           // conn.Close();
+            // conn.Close();
             tbCNumberSupp.Clear();
             tbEmailSupp.Clear();
             tbNameSupp.Clear();
-           // conn.Open();
+            // conn.Open();
             adap = new SqlDataAdapter();
             ds = new DataSet();
             sql = "SELECT Name,Contact_Number,Email FROM Supplier";
@@ -812,8 +778,8 @@ namespace FIX_IT_Workshop
             conn.Open();
 
             ds = new DataSet();
-            string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[dgvSupp.CurrentRow.Index,0].Value}'";
-            
+            string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[dgvSupp.CurrentRow.Index, 0].Value}'";
+
             command = new SqlCommand(sql, conn);
             SqlDataAdapter adap = new SqlDataAdapter();
             adap.InsertCommand = command;
@@ -874,7 +840,7 @@ namespace FIX_IT_Workshop
 
         private void txtDeleteCustomerFirstName_TextChanged(object sender, EventArgs e)
         {
-            filterRecords($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client WHERE UPPER(First_Name) LIKE '%{txtDeleteCustomerFirstName.Text.ToUpper()}%' AND UPPER(Last_Name) LIKE '%{txtDeleteCustomerLastName.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{txtDeleteCustomerEmail.Text.ToUpper()}%' AND UPPER(Contact_Number) LIKE '%{txtDeleteCustomerContactNumber.Text.ToUpper()}%'", dgvDeleteCustomer);   
+            filterRecords($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client WHERE UPPER(First_Name) LIKE '%{txtDeleteCustomerFirstName.Text.ToUpper()}%' AND UPPER(Last_Name) LIKE '%{txtDeleteCustomerLastName.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{txtDeleteCustomerEmail.Text.ToUpper()}%' AND UPPER(Contact_Number) LIKE '%{txtDeleteCustomerContactNumber.Text.ToUpper()}%'", dgvDeleteCustomer);
         }
 
         private void txtDeleteCustomerLastName_TextChanged(object sender, EventArgs e)
@@ -921,7 +887,7 @@ namespace FIX_IT_Workshop
         private void txtUpdateCustomerLastName_TextChanged(object sender, EventArgs e)
         {
             filterRecords($"SELECT First_Name, Last_Name, Email, Contact_Number FROM Client WHERE UPPER(First_Name) LIKE '%{txtUpdateCustomerFirstName.Text.ToUpper()}%' AND UPPER(Last_Name) LIKE '%{txtUpdateCustomerLastName.Text.ToUpper()}%' AND UPPER(Email) LIKE '%{txtUpdateCustomerEmail.Text.ToUpper()}%' AND UPPER(Contact_Number) LIKE '%{txtUpdateCustomerContactNumber.Text.ToUpper()}%'", dgvUpdateCustomerDetails);
-                    }
+        }
 
         private void txtUpdateCustomerEmail_TextChanged(object sender, EventArgs e)
         {
@@ -1045,59 +1011,295 @@ namespace FIX_IT_Workshop
             pnlMakePurcahes.BringToFront();
         }
 
-        private void updateRecord(string sql, string firstName, string lastName, string email, string contactNumber)
+        private void updateRecord(string sql)
         {
-           
-                try
+            try
+            {
+                //Open Connection
+                if (conn.State != ConnectionState.Open)
                 {
-                    
-
-                    //Open Connection
-                    if (conn.State != ConnectionState.Open)
-                    {
-                        conn.Open();
-                    }
-
-                   
-
-                    //Initialize new command
-                    command = new SqlCommand($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}'", conn);
-
-                    //Initialzie dataAdapter
-                    dataAdapter = new SqlDataAdapter();
-
-                    //Execute statement
-                    dataAdapter.UpdateCommand = command;
-                    dataAdapter.UpdateCommand.ExecuteNonQuery();
-
-                    //Close connection
-                    if (conn.State == ConnectionState.Open)
-                    {
-                        conn.Close();
-                    }
-
-                    //Show suitable success message
-                    MessageBox.Show($"Your changes has successfully been saved.");
+                    conn.Open();
                 }
-                catch (SqlException sqlException)
+
+
+
+                //Initialize new command
+                command = new SqlCommand(sql, conn);
+
+                //Initialzie dataAdapter
+                dataAdapter = new SqlDataAdapter();
+
+                //Execute statement
+                dataAdapter.UpdateCommand = command;
+                dataAdapter.UpdateCommand.ExecuteNonQuery();
+
+                //Close connection
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
+                //Show suitable success message
+                MessageBox.Show($"Changes has successfully been saved.");
+            }
+            catch (SqlException sqlException)
+            {
+                //Show suitable error message
+                MessageBox.Show("Failed to save changes.\nPlease try again later.");
+
+                //Close connection
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
+                Console.WriteLine($"Error: {sqlException.Message}");
+            }
+        }
+
+
+
+        private void updateCustomerDetails(string sql)
+        {
+            // Check if any row is selected
+            if (dgvUpdateCustomerDetails.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvUpdateCustomerDetails.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                string firstName = txtUpdateCustomerFirstName.Text;
+                string lastName = txtUpdateCustomerLastName.Text;
+                string email = txtUpdateCustomerEmail.Text;
+                string contactNumber = txtUpdateCustomerContactNumber.Text;
+
+                if (customerPrimaryKey != -1)
+                {
+                   
+                }
+                else
                 {
                     //Show suitable error message
-                    MessageBox.Show("Failed to save changes.\nPlease try again later.");
+                    MessageBox.Show("Failed to load client profile.\nPlease try again later.");
+                }
+                
+            }
+        }
 
-                    //Close connection
-                    if (conn.State == ConnectionState.Open)
-                    {
-                        conn.Close();
-                    }
+        private void setCustomerPrimaryKey(string firstName, string lastName, string email, string contactNumber)
+        {
+            customerPrimaryKey = -1;
+            try
+            {
+                // Open connection to the DB
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
 
-                    Console.WriteLine($"Error: {sqlException.Message}");
+                //Count all matching emails to check for duplicates
+                String sql = $"SELECT Client_ID FROM Client WHERE UPPER(Email)  = '{email.ToUpper()}' AND UPPER(First_Name)  = '{firstName.ToUpper()}' AND UPPER(Last_Name)  = '{lastName.ToUpper()}' AND Contact_Number  = '{contactNumber}'";
+
+                // Initialize new Sql command
+                command = new SqlCommand(sql, conn);
+
+                // Execute command
+                dataReader = command.ExecuteReader();
+
+
+
+                while (dataReader.Read())
+                {
+                    customerPrimaryKey = dataReader.GetInt32(0);
+                }
+                // Close conenction to DB
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
                 }
             }
-        
+            catch (Exception ex)
+            {
+                // Display suitable error dialog
+                MessageBox.Show("An error has occured " + ex.Message);
+
+                // Close connection if open
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+        private void setCustomerUpdateVehicleFields(int customerId)
+        {
+           
+            try
+            {
+                // Open connection to the DB
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+
+                //Count all matching emails to check for duplicates
+                String sql = $"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE Customer_ID = {customerId}";
+
+                // Initialize new Sql command
+                command = new SqlCommand(sql, conn);
+
+                // Execute command
+                dataReader = command.ExecuteReader();
+
+
+
+                while (dataReader.Read())
+                {
+                    txtUpdateCustomerVehicleDetailsFilledMake.Text = dataReader.GetValue(0).ToString();
+                    txtUpdateCustomerVehicleDetailsFilledModel.Text = dataReader.GetValue(1).ToString();
+                    txtUpdateCustomerVehicleDetailsFilledYear.Text = dataReader.GetValue(2).ToString();
+                    txtUpdateCustomerVehicleDetailsFilledLicensePlate.Text = dataReader.GetValue(3).ToString();
+                }
+                // Close conenction to DB
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display suitable error dialog
+                MessageBox.Show("An error has occured " + ex.Message);
+
+                // Close connection if open
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+
+
+        }
+
 
         private void btnUpdateCustomerDetailsConfirm_Click(object sender, EventArgs e)
+        { 
+            showNewCustomerPanel(pnlUpdateCustomerDetailsFilled);
+            txtUpdateCustomerDetailsFilledFirstName.Text = txtUpdateCustomerFirstName.Text;
+            txtUpdateCustomerDetailsFilledLastName.Text = txtUpdateCustomerLastName.Text;
+            txtUpdateCustomerDetailsFilledEmail.Text = txtUpdateCustomerEmail.Text;
+            txtUpdateCustomerDetailsFilledContactNumber.Text = txtUpdateCustomerContactNumber.Text;
+
+            setCustomerPrimaryKey(txtUpdateCustomerDetailsFilledFirstName.Text, txtUpdateCustomerDetailsFilledLastName.Text, txtUpdateCustomerDetailsFilledEmail.Text, txtUpdateCustomerDetailsFilledContactNumber.Text);
+            setCustomerUpdateVehicleFields(customerPrimaryKey);
+        
+        }
+
+        private void populateUpdateCustomerDetailsTextBoxes()
         {
 
+
+            // Check if any row is selected
+            if (dgvUpdateCustomerDetails.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvUpdateCustomerDetails.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                string firstName = selectedRow.Cells["First_Name"].Value.ToString();
+                string lastName = selectedRow.Cells["Last_Name"].Value.ToString();
+                string email = selectedRow.Cells["Email"].Value.ToString();
+                string contactNumber = selectedRow.Cells["Contact_Number"].Value.ToString();
+
+                txtUpdateCustomerContactNumber.Text = contactNumber;
+                txtUpdateCustomerEmail.Text = email;
+                txtUpdateCustomerFirstName.Text = firstName;
+                txtUpdateCustomerLastName.Text = lastName;
+
+                btnUpdateCustomerDetailsConfirm.Enabled = true;
+            }
+            else
+            {
+                btnUpdateCustomerDetailsConfirm.Enabled = false;
+            }
+        }
+
+        private void dgvUpdateCustomerDetails_SelectionChanged(object sender, EventArgs e)
+        {
+            populateUpdateCustomerDetailsTextBoxes();
+        } 
+
+        private void btnUpdateCustomerDetailsFilledCancel_Click_1(object sender, EventArgs e)
+        {
+            showNewCustomerPanel(pnlUpdateCustomerDetails);
+        }
+
+        private void btnUpdateCustomerDetailsFilledContinue_Click(object sender, EventArgs e)
+        {
+            showNewCustomerPanel(pnlUpdateCustomerVehicleDetailsFilled);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            showNewCustomerPanel(pnlUpdateCustomerDetails);
+            string firstName = txtUpdateCustomerDetailsFilledFirstName.Text;
+            string lastName = txtUpdateCustomerDetailsFilledLastName.Text;
+            string email = txtUpdateCustomerDetailsFilledEmail.Text;
+            string contactNumber = txtUpdateCustomerDetailsFilledContactNumber.Text;
+
+            string make = txtUpdateCustomerVehicleDetailsFilledMake.Text;
+            string model = txtUpdateCustomerVehicleDetailsFilledModel.Text;
+            string year = txtUpdateCustomerVehicleDetailsFilledYear.Text;
+            string licensePlate = txtUpdateCustomerVehicleDetailsFilledLicensePlate.Text;
+
+    
+            updateRecord($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}");
+            updateRecord($"UPDATE Vehicle SET Make = '{make}', Model = '{model}', Year = '{year}', License_Plate_Number = '{licensePlate}' WHERE Client_ID = ${customerPrimaryKey}");
+        }
+
+        private void btnUpdateCustomerVehicleDetailsFilledBack_Click(object sender, EventArgs e)
+        {
+            showNewCustomerPanel(pnlUpdateCustomerDetailsFilled);
+        }
+
+        private void btnCustomerVehicleInfoFinish_Click_1(object sender, EventArgs e)
+        {
+
+            if (verifyVehicleDetails())
+            {
+                string firstName = txtCustomerFirstName.Text;
+                string lastName = txtCustomerLastName.Text;
+                string email = txtCustomerEmail.Text;
+                string contactNumber = txtCustomerContactNumber.Text;
+
+                string make = txtCustomerVehicleMake.Text;
+                string model = txtCustomerVehicleModel.Text;
+                string year = txtCustomerVehicleYear.Text;
+                string licensePlate = txtCustomerVehicleLicensePlate.Text;
+
+                int vehicleId = addVehicle(make, model, year, licensePlate);
+                addUser(firstName, lastName, email, contactNumber, vehicleId);
+
+                clearCustomerDetailValues();
+                clearCustomerVehcileDetails();
+
+
+                showNewCustomerPanel(pnlCustomerOptions);
+                pnlCustomerOptions.BringToFront();
+            }
+            else
+            {
+                //Display appropiate message to the user
+                MessageBox.Show($"Please fill out all fields before continuing.");
+            }
+        }
+
+        private void btnCustomerVehicleInfoBack_Click_1(object sender, EventArgs e)
+        {
+
+            pnlCustomerDetails.BringToFront();
+
+            showNewCustomerPanel(pnlCustomerDetails);
         }
     }
 }

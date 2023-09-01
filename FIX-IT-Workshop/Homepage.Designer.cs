@@ -30,6 +30,7 @@ namespace FIX_IT_Workshop
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Homepage));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlMenu = new System.Windows.Forms.Panel();
             this.lblUsers = new System.Windows.Forms.Label();
@@ -303,6 +304,17 @@ namespace FIX_IT_Workshop
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.lblFilterOptionsRomveHeading = new System.Windows.Forms.Label();
+            this.btnDeleteCustomerClearFilter = new System.Windows.Forms.Button();
+            this.lblDeleteCustomerContactNumber = new System.Windows.Forms.Label();
+            this.lblDeleteCustomerEmail = new System.Windows.Forms.Label();
+            this.lblDeleteCustomerLastName = new System.Windows.Forms.Label();
+            this.lblDeleteCustomerFirstName = new System.Windows.Forms.Label();
+            this.txtDeleteCustomerContactNumber = new System.Windows.Forms.TextBox();
+            this.txtDeleteCustomerLastName = new System.Windows.Forms.TextBox();
+            this.txtDeleteCustomerEmail = new System.Windows.Forms.TextBox();
+            this.txtDeleteCustomerFirstName = new System.Windows.Forms.TextBox();
             this.lblNameSupp = new System.Windows.Forms.Label();
             this.lblCNumberSupp = new System.Windows.Forms.Label();
             this.lblTitleSupp = new System.Windows.Forms.Label();
@@ -349,6 +361,7 @@ namespace FIX_IT_Workshop
             this.pnlAdd_New_Users.SuspendLayout();
             this.pnlView_All_Users.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dGVDiplay_Users)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlMenu
@@ -1454,11 +1467,16 @@ namespace FIX_IT_Workshop
             // tbpAddCustomer
             // 
             this.tbpAddCustomer.BackColor = System.Drawing.Color.Snow;
+            this.tbpAddCustomer.Controls.Add(this.pnlDeleteCustomer);
+            this.tbpAddCustomer.Controls.Add(this.pnlViewAllVehicles);
+            this.tbpAddCustomer.Controls.Add(this.pnlUpdateCustomerDetails);
+            this.tbpAddCustomer.Controls.Add(this.pnlCustomerViewAll);
             this.tbpAddCustomer.Controls.Add(this.pnlCustomerOptions);
             this.tbpAddCustomer.Controls.Add(this.pnlCustomerVehicleInfo);
             this.tbpAddCustomer.Controls.Add(this.pnlUpdateCustomerVehicleDetailsFilled);
             this.tbpAddCustomer.Controls.Add(this.pnlCustomerDetails);
             this.tbpAddCustomer.Controls.Add(this.pnlUpdateCustomerDetailsFilled);
+            this.tbpAddCustomer.Location = new System.Drawing.Point(4, 22);
             this.tbpAddCustomer.Controls.Add(this.pnlDeleteCustomer);
             this.tbpAddCustomer.Controls.Add(this.pnlViewAllVehicles);
             this.tbpAddCustomer.Controls.Add(this.pnlUpdateCustomerDetails);
@@ -2783,6 +2801,9 @@ namespace FIX_IT_Workshop
             this.dgvSupp.Location = new System.Drawing.Point(120, 323);
             this.dgvSupp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvSupp.Name = "dgvSupp";
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvSupp.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvSupp.Size = new System.Drawing.Size(672, 186);
             this.dgvSupp.RowHeadersWidth = 51;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dgvSupp.RowsDefaultCellStyle = dataGridViewCellStyle2;
@@ -3663,6 +3684,132 @@ namespace FIX_IT_Workshop
             this.button5.Size = new System.Drawing.Size(75, 23);
             this.button5.TabIndex = 0;
             // 
+            // panel1
+            // 
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Controls.Add(this.btnDeleteCustomerClearFilter);
+            this.panel1.Controls.Add(this.lblDeleteCustomerContactNumber);
+            this.panel1.Controls.Add(this.lblDeleteCustomerEmail);
+            this.panel1.Controls.Add(this.lblDeleteCustomerLastName);
+            this.panel1.Controls.Add(this.lblDeleteCustomerFirstName);
+            this.panel1.Controls.Add(this.txtDeleteCustomerContactNumber);
+            this.panel1.Controls.Add(this.txtDeleteCustomerLastName);
+            this.panel1.Controls.Add(this.txtDeleteCustomerEmail);
+            this.panel1.Controls.Add(this.txtDeleteCustomerFirstName);
+            this.panel1.Controls.Add(this.lblFilterOptionsRomveHeading);
+            this.panel1.Location = new System.Drawing.Point(66, 10);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(714, 211);
+            this.panel1.TabIndex = 21;
+            // 
+            // lblFilterOptionsRomveHeading
+            // 
+            this.lblFilterOptionsRomveHeading.AutoSize = true;
+            this.lblFilterOptionsRomveHeading.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFilterOptionsRomveHeading.ForeColor = System.Drawing.Color.Black;
+            this.lblFilterOptionsRomveHeading.Location = new System.Drawing.Point(10, 6);
+            this.lblFilterOptionsRomveHeading.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblFilterOptionsRomveHeading.Name = "lblFilterOptionsRomveHeading";
+            this.lblFilterOptionsRomveHeading.Size = new System.Drawing.Size(130, 25);
+            this.lblFilterOptionsRomveHeading.TabIndex = 23;
+            this.lblFilterOptionsRomveHeading.Text = "Filter options:";
+            // 
+            // btnDeleteCustomerClearFilter
+            // 
+            this.btnDeleteCustomerClearFilter.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnDeleteCustomerClearFilter.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDeleteCustomerClearFilter.Location = new System.Drawing.Point(17, 150);
+            this.btnDeleteCustomerClearFilter.Margin = new System.Windows.Forms.Padding(6);
+            this.btnDeleteCustomerClearFilter.Name = "btnDeleteCustomerClearFilter";
+            this.btnDeleteCustomerClearFilter.Size = new System.Drawing.Size(672, 40);
+            this.btnDeleteCustomerClearFilter.TabIndex = 32;
+            this.btnDeleteCustomerClearFilter.Text = "Clear Filter";
+            this.btnDeleteCustomerClearFilter.UseVisualStyleBackColor = true;
+            // 
+            // lblDeleteCustomerContactNumber
+            // 
+            this.lblDeleteCustomerContactNumber.AutoSize = true;
+            this.lblDeleteCustomerContactNumber.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeleteCustomerContactNumber.ForeColor = System.Drawing.Color.Black;
+            this.lblDeleteCustomerContactNumber.Location = new System.Drawing.Point(340, 109);
+            this.lblDeleteCustomerContactNumber.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblDeleteCustomerContactNumber.Name = "lblDeleteCustomerContactNumber";
+            this.lblDeleteCustomerContactNumber.Size = new System.Drawing.Size(160, 25);
+            this.lblDeleteCustomerContactNumber.TabIndex = 31;
+            this.lblDeleteCustomerContactNumber.Text = "Contact Number:";
+            // 
+            // lblDeleteCustomerEmail
+            // 
+            this.lblDeleteCustomerEmail.AutoSize = true;
+            this.lblDeleteCustomerEmail.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeleteCustomerEmail.ForeColor = System.Drawing.Color.Black;
+            this.lblDeleteCustomerEmail.Location = new System.Drawing.Point(12, 109);
+            this.lblDeleteCustomerEmail.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblDeleteCustomerEmail.Name = "lblDeleteCustomerEmail";
+            this.lblDeleteCustomerEmail.Size = new System.Drawing.Size(64, 25);
+            this.lblDeleteCustomerEmail.TabIndex = 30;
+            this.lblDeleteCustomerEmail.Text = "Email:";
+            // 
+            // lblDeleteCustomerLastName
+            // 
+            this.lblDeleteCustomerLastName.AutoSize = true;
+            this.lblDeleteCustomerLastName.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeleteCustomerLastName.ForeColor = System.Drawing.Color.Black;
+            this.lblDeleteCustomerLastName.Location = new System.Drawing.Point(340, 52);
+            this.lblDeleteCustomerLastName.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblDeleteCustomerLastName.Name = "lblDeleteCustomerLastName";
+            this.lblDeleteCustomerLastName.Size = new System.Drawing.Size(108, 25);
+            this.lblDeleteCustomerLastName.TabIndex = 29;
+            this.lblDeleteCustomerLastName.Text = "Last Name:";
+            // 
+            // lblDeleteCustomerFirstName
+            // 
+            this.lblDeleteCustomerFirstName.AutoSize = true;
+            this.lblDeleteCustomerFirstName.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeleteCustomerFirstName.ForeColor = System.Drawing.Color.Black;
+            this.lblDeleteCustomerFirstName.Location = new System.Drawing.Point(12, 50);
+            this.lblDeleteCustomerFirstName.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblDeleteCustomerFirstName.Name = "lblDeleteCustomerFirstName";
+            this.lblDeleteCustomerFirstName.Size = new System.Drawing.Size(111, 25);
+            this.lblDeleteCustomerFirstName.TabIndex = 28;
+            this.lblDeleteCustomerFirstName.Text = "First Name:";
+            // 
+            // txtDeleteCustomerContactNumber
+            // 
+            this.txtDeleteCustomerContactNumber.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtDeleteCustomerContactNumber.Location = new System.Drawing.Point(515, 106);
+            this.txtDeleteCustomerContactNumber.Margin = new System.Windows.Forms.Padding(6);
+            this.txtDeleteCustomerContactNumber.Name = "txtDeleteCustomerContactNumber";
+            this.txtDeleteCustomerContactNumber.Size = new System.Drawing.Size(174, 33);
+            this.txtDeleteCustomerContactNumber.TabIndex = 27;
+            // 
+            // txtDeleteCustomerLastName
+            // 
+            this.txtDeleteCustomerLastName.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtDeleteCustomerLastName.Location = new System.Drawing.Point(475, 50);
+            this.txtDeleteCustomerLastName.Margin = new System.Windows.Forms.Padding(6);
+            this.txtDeleteCustomerLastName.Name = "txtDeleteCustomerLastName";
+            this.txtDeleteCustomerLastName.Size = new System.Drawing.Size(214, 33);
+            this.txtDeleteCustomerLastName.TabIndex = 25;
+            // 
+            // txtDeleteCustomerEmail
+            // 
+            this.txtDeleteCustomerEmail.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtDeleteCustomerEmail.Location = new System.Drawing.Point(145, 106);
+            this.txtDeleteCustomerEmail.Margin = new System.Windows.Forms.Padding(6);
+            this.txtDeleteCustomerEmail.Name = "txtDeleteCustomerEmail";
+            this.txtDeleteCustomerEmail.Size = new System.Drawing.Size(174, 33);
+            this.txtDeleteCustomerEmail.TabIndex = 26;
+            // 
+            // txtDeleteCustomerFirstName
+            // 
+            this.txtDeleteCustomerFirstName.Font = new System.Drawing.Font("Yu Gothic UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtDeleteCustomerFirstName.Location = new System.Drawing.Point(145, 47);
+            this.txtDeleteCustomerFirstName.Margin = new System.Windows.Forms.Padding(6);
+            this.txtDeleteCustomerFirstName.Name = "txtDeleteCustomerFirstName";
+            this.txtDeleteCustomerFirstName.Size = new System.Drawing.Size(174, 33);
+            this.txtDeleteCustomerFirstName.TabIndex = 24;
+            // 
             // lblNameSupp
             // 
             this.lblNameSupp.AutoSize = true;
@@ -3778,6 +3925,8 @@ namespace FIX_IT_Workshop
             this.pnlView_All_Users.ResumeLayout(false);
             this.pnlView_All_Users.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dGVDiplay_Users)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -3838,17 +3987,8 @@ namespace FIX_IT_Workshop
         private System.Windows.Forms.TextBox txtCustomerFirstNameFilter;
         private System.Windows.Forms.Button btnClearCustomerFilterFields;
         private System.Windows.Forms.Panel pnlDeleteCustomer;
-        private System.Windows.Forms.Button btnDeleteCustomerClearFilter;
         private System.Windows.Forms.Label lblInstructionsDeleteCustomers;
         private System.Windows.Forms.DataGridView dgvDeleteCustomer;
-        private System.Windows.Forms.Label lblDeleteCustomerContactNumber;
-        private System.Windows.Forms.Label lblDeleteCustomerEmail;
-        private System.Windows.Forms.Label lblDeleteCustomerLastName;
-        private System.Windows.Forms.Label lblDeleteCustomerFirstName;
-        private System.Windows.Forms.TextBox txtDeleteCustomerContactNumber;
-        private System.Windows.Forms.TextBox txtDeleteCustomerLastName;
-        private System.Windows.Forms.TextBox txtDeleteCustomerEmail;
-        private System.Windows.Forms.TextBox txtDeleteCustomerFirstName;
         private System.Windows.Forms.Button btnDeleteCustomer;
         private System.Windows.Forms.Button btnDeleteCustomersBack;
         private System.Windows.Forms.Button btnViewAllCancel;
@@ -4056,6 +4196,17 @@ namespace FIX_IT_Workshop
         private System.Windows.Forms.TextBox txtCustomerVehicleMake;
         private System.Windows.Forms.Button btnCustomerVehicleInfoBack;
         private System.Windows.Forms.Button btnCustomerVehicleInfoFinish;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button btnDeleteCustomerClearFilter;
+        private System.Windows.Forms.Label lblDeleteCustomerContactNumber;
+        private System.Windows.Forms.Label lblDeleteCustomerEmail;
+        private System.Windows.Forms.Label lblDeleteCustomerLastName;
+        private System.Windows.Forms.Label lblDeleteCustomerFirstName;
+        private System.Windows.Forms.TextBox txtDeleteCustomerContactNumber;
+        private System.Windows.Forms.TextBox txtDeleteCustomerLastName;
+        private System.Windows.Forms.TextBox txtDeleteCustomerEmail;
+        private System.Windows.Forms.TextBox txtDeleteCustomerFirstName;
+        private System.Windows.Forms.Label lblFilterOptionsRomveHeading;
         private System.Windows.Forms.Label lblTitleSupp;
         private System.Windows.Forms.Label lblCNumberSupp;
         private System.Windows.Forms.Label lblNameSupp;

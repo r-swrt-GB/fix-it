@@ -92,6 +92,7 @@ namespace FIX_IT_Workshop
         {
             changeHeading("Manage customers", "Select an applicable option");
             tbcHomepage.SelectedTab = tbpAddCustomer;
+            btnDeleteCustomer.Enabled = false;
             showNewCustomerPanel(pnlCustomerOptions);
             selectLabel(lblAddCustomer);
         }
@@ -286,7 +287,7 @@ namespace FIX_IT_Workshop
             pnlCustomerOptions.BringToFront();
         }
 
-        private void addUser(string firstName, string lastName, string email, string contactNumber, int vehicleId)
+        private void addClient(string firstName, string lastName, string email, string contactNumber)
         {
             try
             {
@@ -300,15 +301,12 @@ namespace FIX_IT_Workshop
                 }
 
                 //Initialize new command
-                string sql = $"INSERT INTO Client (Client_ID, First_Name, Last_Name, Email, Contact_Number) VALUES (@client_id ,@first_name, @last_name, @email, @contact_number)";
+                string sql = $"INSERT INTO Client (First_Name, Last_Name, Email, Contact_Number) VALUES (@first_name, @last_name, @email, @contact_number)";
                 command = new SqlCommand(sql, conn);
                 command.Parameters.AddWithValue("@first_name", firstName);
-                command.Parameters.AddWithValue("@client_id", 7);
                 command.Parameters.AddWithValue("@last_name", lastName);
                 command.Parameters.AddWithValue("@email", email);
                 command.Parameters.AddWithValue("@contact_number", contactNumber);
-
-
 
                 command.ExecuteNonQuery();
 
@@ -326,7 +324,7 @@ namespace FIX_IT_Workshop
             catch (SqlException sqlException)
             {
                 //Show suitable error message
-                MessageBox.Show("Sign up failed.\nPlease try again later.");
+                MessageBox.Show("Sign up failed.\nPlease try again later. \n" + sqlException.Message);
 
                 //Close connection
                 if (conn.State == ConnectionState.Open)
@@ -338,7 +336,7 @@ namespace FIX_IT_Workshop
             }
         }
 
-        private int addVehicle(string make, string model, string year, string licensePlateNumber)
+        private void addVehicle(string make, string model, string year, string licensePlateNumber, int customerId)
         {
             try
             {
@@ -352,13 +350,13 @@ namespace FIX_IT_Workshop
                 }
 
                 //Initialize new command
-                string sql = $"INSERT INTO Vehicle (Vehicle_ID,Make, Model, Year, License_Plate_Number) VALUES (@vehicle_id, @make, @model, @year, @lisence_plate_number)";
+                string sql = $"INSERT INTO Vehicle (Make, Model, Year, License_Plate_Number, Client_ID) VALUES (@make, @model, @year, @lisence_plate_number, @customer_id)";
                 command = new SqlCommand(sql, conn);
                 command.Parameters.AddWithValue("@make", make);
-                command.Parameters.AddWithValue("@vehicle_id", make);
                 command.Parameters.AddWithValue("@model", model);
                 command.Parameters.AddWithValue("@year", year);
                 command.Parameters.AddWithValue("@lisence_plate_number", licensePlateNumber);
+                command.Parameters.AddWithValue("@customer_id", customerId);
                 command.ExecuteNonQuery();
 
 
@@ -368,8 +366,6 @@ namespace FIX_IT_Workshop
                 {
                     conn.Close();
                 }
-
-                return 0;
             }
             catch (SqlException sqlException)
             {
@@ -383,16 +379,11 @@ namespace FIX_IT_Workshop
                 }
 
                 Console.WriteLine($"Error: {sqlException.Message}");
-
-                return 0;
             }
         }
 
-        
-        private void btnCustomerVehicleInfoBack_Click(object sender, EventArgs e)
-        {
 
-        }
+
 
         public void resetCustomerViewAllFilter()
         {
@@ -407,22 +398,83 @@ namespace FIX_IT_Workshop
             resetCustomerViewAllFilter();
         }
 
+        public void deleteRecord(string sql, bool showMessage)
+        {
+            try
+            {
+
+
+                //Open Connection
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+
+                //Initialize new command
+                command = new SqlCommand(sql, conn);
+
+                //Initialzie dataAdapter
+                dataAdapter = new SqlDataAdapter();
+
+                //Execute statement
+                dataAdapter.DeleteCommand = command;
+                dataAdapter.DeleteCommand.ExecuteNonQuery();
+
+                //Close connection
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
+                if (showMessage)
+                {
+                    //Show suitable success message
+                    MessageBox.Show($"Record successfully deleted");
+                }
+            }
+            catch (SqlException sqlException)
+            {
+                //Show suitable error message
+                MessageBox.Show("Failed to delete record.\nPlease try again later. " + sqlException.Message);
+
+                //Close connection
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
+                Console.WriteLine($"Error: {sqlException.Message}");
+            }
+        }
+
         public void resetDeleteCustomerFilter()
         {
-            txtCustomerFirstNameFilter.Clear();
-            txtCustomerLastNameFilter.Clear();
-            txtCustomerEmailFilter.Clear();
-            txtCustomerContactNumberFilter.Clear();
+            txtDeleteCustomerFirstName.Clear();
+            txtDeleteCustomerLastName.Clear();
+            txtDeleteCustomerEmail.Clear();
+            txtDeleteCustomerContactNumber.Clear();
         }
 
         private void btnDeleteCustomer_Click(object sender, EventArgs e)
         {
-            resetDeleteCustomerFilter();
+            DialogResult result = MessageBox.Show("Are you sure you want to delete this record? This cannout be undone.", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                string name = txtDeleteCustomerFirstName.Text;
+                string surname = txtDeleteCustomerLastName.Text;
+                string contactNumber = txtDeleteCustomerContactNumber.Text;
+                string email = txtDeleteCustomerEmail.Text;
+                setCustomerPrimaryKey(name, surname, email, contactNumber);
+                MessageBox.Show(customerPrimaryKey.ToString());
+                deleteRecord($"DELETE FROM Client WHERE First_Name = '{txtDeleteCustomerFirstName.Text}' AND Last_Name = '{txtDeleteCustomerLastName.Text}' AND Contact_Number = '{txtDeleteCustomerContactNumber.Text}' AND Email = '{txtDeleteCustomerEmail.Text}'", false);
+                deleteRecord($"DELETE FROM Vehicle WHERE Client_ID = {customerPrimaryKey}", true);
+                resetDeleteCustomerFilter();
+            }
         }
 
         private void btnDeleteCustomersBack_Click(object sender, EventArgs e)
         {
-
             showNewCustomerPanel(pnlCustomerOptions);
             pnlCustomerOptions.BringToFront();
         }
@@ -486,7 +538,6 @@ namespace FIX_IT_Workshop
         {
             try
             {
-
                 // Open connection to the DB
                 if (conn.State == ConnectionState.Closed)
                 {
@@ -860,23 +911,22 @@ namespace FIX_IT_Workshop
 
         private void txtViewAllVehiclesMake_TextChanged(object sender, EventArgs e)
         {
-            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Client WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
+            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
         }
 
         private void txtViewAllVehiclesModel_TextChanged(object sender, EventArgs e)
         {
-            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Client WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
+            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
         }
 
         private void txtViewAllVehiclesLicensePlate_TextChanged(object sender, EventArgs e)
         {
-            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Client WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
-
+            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
         }
 
         private void txtViewAllVehiclesYear_TextChanged(object sender, EventArgs e)
         {
-            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Client WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
+            filterRecords($"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE UPPER(Make) LIKE '%{txtViewAllVehiclesMake.Text.ToUpper()}%' AND UPPER(Model) LIKE '%{txtViewAllVehiclesModel.Text.ToUpper()}%' AND UPPER(Year) LIKE '%{txtViewAllVehiclesYear.Text.ToUpper()}%' AND UPPER(License_Plate_Number) LIKE '%{txtViewAllVehiclesLicensePlate.Text.ToUpper()}%'", dgvViewAllVehicles);
         }
 
         private void txtUpdateCustomerFirstName_TextChanged(object sender, EventArgs e)
@@ -1021,8 +1071,6 @@ namespace FIX_IT_Workshop
                     conn.Open();
                 }
 
-
-
                 //Initialize new command
                 command = new SqlCommand(sql, conn);
 
@@ -1075,14 +1123,14 @@ namespace FIX_IT_Workshop
 
                 if (customerPrimaryKey != -1)
                 {
-                   
+
                 }
                 else
                 {
                     //Show suitable error message
                     MessageBox.Show("Failed to load client profile.\nPlease try again later.");
                 }
-                
+
             }
         }
 
@@ -1111,6 +1159,7 @@ namespace FIX_IT_Workshop
                 while (dataReader.Read())
                 {
                     customerPrimaryKey = dataReader.GetInt32(0);
+                    MessageBox.Show("Hi");
                 }
                 // Close conenction to DB
                 if (conn.State == ConnectionState.Open)
@@ -1133,7 +1182,7 @@ namespace FIX_IT_Workshop
 
         private void setCustomerUpdateVehicleFields(int customerId)
         {
-           
+
             try
             {
                 // Open connection to the DB
@@ -1143,7 +1192,7 @@ namespace FIX_IT_Workshop
                 }
 
                 //Count all matching emails to check for duplicates
-                String sql = $"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE Customer_ID = {customerId}";
+                String sql = $"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE Client_ID = {customerId}";
 
                 // Initialize new Sql command
                 command = new SqlCommand(sql, conn);
@@ -1183,7 +1232,7 @@ namespace FIX_IT_Workshop
 
 
         private void btnUpdateCustomerDetailsConfirm_Click(object sender, EventArgs e)
-        { 
+        {
             showNewCustomerPanel(pnlUpdateCustomerDetailsFilled);
             txtUpdateCustomerDetailsFilledFirstName.Text = txtUpdateCustomerFirstName.Text;
             txtUpdateCustomerDetailsFilledLastName.Text = txtUpdateCustomerLastName.Text;
@@ -1192,13 +1241,11 @@ namespace FIX_IT_Workshop
 
             setCustomerPrimaryKey(txtUpdateCustomerDetailsFilledFirstName.Text, txtUpdateCustomerDetailsFilledLastName.Text, txtUpdateCustomerDetailsFilledEmail.Text, txtUpdateCustomerDetailsFilledContactNumber.Text);
             setCustomerUpdateVehicleFields(customerPrimaryKey);
-        
+
         }
 
         private void populateUpdateCustomerDetailsTextBoxes()
         {
-
-
             // Check if any row is selected
             if (dgvUpdateCustomerDetails.SelectedRows.Count > 0)
             {
@@ -1224,10 +1271,80 @@ namespace FIX_IT_Workshop
             }
         }
 
+        private void populateViewAllVehiclesTextBoxes()
+        {
+            // Check if any row is selected
+            if (dgvViewAllVehicles.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvViewAllVehicles.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                string make = selectedRow.Cells["Make"].Value.ToString();
+                string model = selectedRow.Cells["Model"].Value.ToString();
+                string year = selectedRow.Cells["Year"].Value.ToString();
+                string licensePlateNumber = selectedRow.Cells["License_Plate_Number"].Value.ToString();
+
+                txtViewAllVehiclesMake.Text = make;
+                txtViewAllVehiclesYear.Text = year;
+                txtViewAllVehiclesModel.Text = model;
+                txtViewAllVehiclesLicensePlate.Text = licensePlateNumber;
+            }
+        }
+
+        private void populateViewAllCustomerTextBoxes()
+        {
+            // Check if any row is selected
+            if (dgvViewAllCustomers.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvViewAllCustomers.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                string firstName = selectedRow.Cells["First_Name"].Value.ToString();
+                string lastName = selectedRow.Cells["Last_Name"].Value.ToString();
+                string email = selectedRow.Cells["Email"].Value.ToString();
+                string contactNumber = selectedRow.Cells["Contact_Number"].Value.ToString();
+
+                txtCustomerFirstNameFilter.Text = firstName;
+                txtCustomerLastNameFilter.Text = lastName;
+                txtCustomerEmailFilter.Text = email;
+                txtCustomerContactNumberFilter.Text = contactNumber;
+            }
+        }
+
+        private void populateDeleteCustomerTextBoxes()
+        {
+            // Check if any row is selected
+            if (dgvDeleteCustomer.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvDeleteCustomer.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                string firstName = selectedRow.Cells["First_Name"].Value.ToString();
+                string lastName = selectedRow.Cells["Last_Name"].Value.ToString();
+                string email = selectedRow.Cells["Email"].Value.ToString();
+                string contactNumber = selectedRow.Cells["Contact_Number"].Value.ToString();
+
+                txtDeleteCustomerFirstName.Text = firstName;
+                txtDeleteCustomerLastName.Text = lastName;
+                txtDeleteCustomerContactNumber.Text = contactNumber;
+                txtDeleteCustomerEmail.Text = email;
+
+                btnDeleteCustomer.Enabled = true;
+            }
+            else
+            {
+                btnDeleteCustomer.Enabled = false;
+            }
+        
+        }
+
         private void dgvUpdateCustomerDetails_SelectionChanged(object sender, EventArgs e)
         {
             populateUpdateCustomerDetailsTextBoxes();
-        } 
+        }
 
         private void btnUpdateCustomerDetailsFilledCancel_Click_1(object sender, EventArgs e)
         {
@@ -1252,7 +1369,7 @@ namespace FIX_IT_Workshop
             string year = txtUpdateCustomerVehicleDetailsFilledYear.Text;
             string licensePlate = txtUpdateCustomerVehicleDetailsFilledLicensePlate.Text;
 
-    
+
             updateRecord($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}");
             updateRecord($"UPDATE Vehicle SET Make = '{make}', Model = '{model}', Year = '{year}', License_Plate_Number = '{licensePlate}' WHERE Client_ID = ${customerPrimaryKey}");
         }
@@ -1277,8 +1394,12 @@ namespace FIX_IT_Workshop
                 string year = txtCustomerVehicleYear.Text;
                 string licensePlate = txtCustomerVehicleLicensePlate.Text;
 
-                int vehicleId = addVehicle(make, model, year, licensePlate);
-                addUser(firstName, lastName, email, contactNumber, vehicleId);
+                addClient(firstName, lastName, email, contactNumber);
+
+
+                setCustomerPrimaryKey(firstName, lastName, email, contactNumber);
+                addVehicle(make, model, year, licensePlate, customerPrimaryKey);
+
 
                 clearCustomerDetailValues();
                 clearCustomerVehcileDetails();
@@ -1300,6 +1421,30 @@ namespace FIX_IT_Workshop
             pnlCustomerDetails.BringToFront();
 
             showNewCustomerPanel(pnlCustomerDetails);
+        }
+
+        private void dgvViewAllCustomers_SelectionChanged(object sender, EventArgs e)
+        {
+            populateViewAllCustomerTextBoxes();
+        }
+
+
+
+        private void dgvDeleteCustomer_SelectionChanged(object sender, EventArgs e)
+        {
+            populateDeleteCustomerTextBoxes();
+        }
+
+
+
+        private void dgvViewAllVehicles_SelectionChanged(object sender, EventArgs e)
+        {
+            populateViewAllVehiclesTextBoxes();
+        }
+
+        private void btnDeleteCustomerClearFilter_Click(object sender, EventArgs e)
+        {
+            resetDeleteCustomerFilter();
         }
     }
 }

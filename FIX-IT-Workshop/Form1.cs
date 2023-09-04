@@ -80,7 +80,7 @@ namespace FIX_IT_Workshop
 
         private void showHomePage()
         {
-            Homepage homepage = new Homepage();
+            Homepage homepage = new Homepage(userId);
             homepage.Show();
 
             this.Hide();

@@ -5,6 +5,8 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace FIX_IT_Workshop
@@ -14,20 +16,18 @@ namespace FIX_IT_Workshop
         Color selectedLabelColour = Color.FromArgb(180, 184, 171);
         Label currentlySelectedLabel;
 
-        private SqlDataAdapter adap;
-        private DataSet ds;
-        public string connstr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|DanieToets.mdf;Integrated Security=True";
-
         //Declare SqlControls
         private SqlConnection conn;
         private SqlCommand command;
         private SqlDataReader dataReader;
         private SqlDataAdapter dataAdapter;
+        private DataSet dataSet;
 
         int userId;
         int repairClientId;
         int purchaseClientId;
         int customerPrimaryKey = -1;
+        bool isAdmin;
         List<string> standartServiceItems = new List<string>();
         List<int> standartServiceItemQuantity = new List<int>();
         List<string> repairItems = new List<string>();
@@ -44,15 +44,12 @@ namespace FIX_IT_Workshop
         {
             InitializeComponent();
             this.userId = userId;
-            standartServiceItems.Add("101");
-            standartServiceItems.Add("102");
-            standartServiceItems.Add("103");
-            standartServiceItems.Add("104");
-            standartServiceItems.Add("105");
-            standartServiceItems.Add("106");
-            standartServiceItems.Add("107");
-            standartServiceItems.Add("108");
-            standartServiceItems.Add("109");
+            standartServiceItems.Add("Spark Plug");
+            standartServiceItems.Add("Brake Fluid");
+            standartServiceItems.Add("Oil Filters");
+            standartServiceItems.Add("Tires (4)");
+            standartServiceItems.Add("Cabin Air Filter");
+            standartServiceItems.Add("Air Filters");
 
             standartServiceItemQuantity.Add(1);
             standartServiceItemQuantity.Add(1);
@@ -60,10 +57,17 @@ namespace FIX_IT_Workshop
             standartServiceItemQuantity.Add(2);
             standartServiceItemQuantity.Add(3);
             standartServiceItemQuantity.Add(2);
-            standartServiceItemQuantity.Add(1);
-            standartServiceItemQuantity.Add(2);
-            standartServiceItemQuantity.Add(1);
 
+
+
+
+        }
+
+        private bool getAdminStatus(int userId)
+        {
+            string role = getValueInTable($"SELECT User_Role FROM [User] WHERE User_ID = {userId}", 0);
+
+            return role.Trim().ToUpper() == "ADMIN";
         }
 
         private void connectDatabase()
@@ -71,7 +75,8 @@ namespace FIX_IT_Workshop
             //Initialize connectionString
             //connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\FixItDatabase.mdf;Integrated Security=True";
 
-            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|DanieToets.mdf;Integrated Security=True";
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\FixItDatabase.mdf;Integrated Security=True";
+
             try
             {
                 //Create new Sql Connection
@@ -153,6 +158,7 @@ namespace FIX_IT_Workshop
 
         private void lblLogOut_Click(object sender, EventArgs e)
         {
+            changeHeading("Logout", "Confirm logout");
             tbcHomepage.SelectedIndex = -1;
             selectLabel(lblLogOut);
             confirmLogout();
@@ -160,65 +166,97 @@ namespace FIX_IT_Workshop
 
         private void lblShop_Click(object sender, EventArgs e)
         {
+            changeHeading("Sales", "Select an applicable option to manage sales");
             tbcHomepage.SelectedTab = tbpShop;
             showNewSalesPanel(pnlSaleChoice);
             selectLabel(lblShop);
+
+            if (!isAdmin)
+            {
+                btnNavOrderFromSupplier.Enabled = false;
+
+            }
+            else
+            {
+                btnNavOrderFromSupplier.Enabled = true;
+            }
 
         }
 
         private void lblBookings_Click(object sender, EventArgs e)
         {
-            tbcHomepage.SelectedTab = tbpBookings;
-            selectLabel(lblSupplier);
-            conn = new SqlConnection(connstr);
-            conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
-            string sql = "SELECT Name,Contact_Number,Email FROM Supplier";
-            command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
-            dgvSupp.DataSource = ds;
-            dgvSupp.DataMember = "Supplier";
-            conn.Close();
+            if (!isAdmin)
+            {
+                MessageBox.Show("You do no have permission to view this page contents", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            }
+            else
+            {
+
+                changeHeading("Suppliers", "Select an applicable option");
+
+                tbcHomepage.SelectedTab = tbpBookings;
+                selectLabel(lblSupplier);
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+                dataAdapter = new SqlDataAdapter();
+                dataSet = new DataSet();
+                string sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+                command = new SqlCommand(sql, conn);
+                dataAdapter.SelectCommand = command;
+                dataAdapter.Fill(dataSet, "Supplier");
+                dgvSupp.DataSource = dataSet;
+                dgvSupp.DataMember = "Supplier";
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+
         }
 
         private void lblOrders_Click(object sender, EventArgs e)
         {
-            tbcHomepage.SelectedTab = tbpOrders;
-            selectLabel(lblOrders);
+            if (!isAdmin)
+            {
+                MessageBox.Show("You do no have permission to view this page contents", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            }
+            else
+            {
+
+                tbcHomepage.SelectedTab = tbpOrders;
+                selectLabel(lblOrders);
+                changeHeading("Reports", "Select a category to generate a report");
+
+                dgvBestSellingProductsSummary.Visible = true;
+                crtBestSellingProducts.Visible = false;
+
+                showReports(pnlReportsBestInventory);
+
+
+                populateChart(5);
+                populateDataGridView(5);
+            }
         }
 
         private void lblStock_Click(object sender, EventArgs e)//Zohan
         {
+            changeHeading("Stock", "Select an applicable option");
             try
             {
                 tbcHomepage.SelectedTab = tbpStock;
                 selectLabel(lblStock);
-                conn = new SqlConnection(connstr);
-                conn.Open();
-                adap = new SqlDataAdapter();
-                ds = new DataSet();
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+                dataAdapter = new SqlDataAdapter();
+                dataSet = new DataSet();
 
-
-
-
-
-
-
-
-
-                string query = @"
-                SELECT 
-                    Inventory.Product_Number,
-                    Inventory.Product_Name,
-                    Inventory.Available_Quantity,
-                    Inventory.Unit_Price,
-                    Supplier.Name AS Supplier_Name
-                FROM 
-                    Inventory
-                INNER JOIN 
-                    Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID";
+                string query = @"SELECT  Inventory.Product_Number,  Inventory.Product_Name, Inventory.Available_Quantity, Inventory.Unit_Price, Supplier.Name AS Supplier_Name FROM Inventory INNER JOIN Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID";
 
                 SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                 DataTable dataTable = new DataTable();
@@ -233,7 +271,10 @@ namespace FIX_IT_Workshop
 
                 }
 
-                conn.Close();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
             }
             catch (SqlException sqlEx)
             {
@@ -356,7 +397,15 @@ namespace FIX_IT_Workshop
 
         private void btnCustomerDetailsContinue_Click(object sender, EventArgs e)
         {
-            if (verifyCustomerDetails())
+            if (!validateEmail(txtCustomerEmail))
+            {
+                MessageBox.Show($"Please enter a valid email before continuing.");
+            }
+            else if (txtCustomerContactNumber.Text.Length != 10)
+            {
+                MessageBox.Show("Please enter a valid contact number");
+            }
+            else if (verifyCustomerDetails())
             {
                 showNewCustomerPanel(pnlCustomerVehicleInfo);
                 pnlCustomerVehicleInfo.BringToFront();
@@ -438,13 +487,12 @@ namespace FIX_IT_Workshop
                 }
 
                 //Initialize new command
-                string sql = $"INSERT INTO Vehicle (Make, Model, Year, License_Plate_Number, Client_ID) VALUES (@make, @model, @year, @lisence_plate_number, @customer_id)";
+                string sql = $"INSERT INTO Vehicle (Make, Model, Year, License_Plate_Number) VALUES (@make, @model, @year, @lisence_plate_number)";
                 command = new SqlCommand(sql, conn);
                 command.Parameters.AddWithValue("@make", make);
                 command.Parameters.AddWithValue("@model", model);
                 command.Parameters.AddWithValue("@year", year);
                 command.Parameters.AddWithValue("@lisence_plate_number", licensePlateNumber);
-                command.Parameters.AddWithValue("@customer_id", customerId);
                 command.ExecuteNonQuery();
 
 
@@ -458,7 +506,7 @@ namespace FIX_IT_Workshop
             catch (SqlException sqlException)
             {
                 //Show suitable error message
-                MessageBox.Show("Sign up failed.\nPlease try again later.");
+                MessageBox.Show("Sign up failed.\nPlease try again later." + sqlException.Message);
 
                 //Close connection
                 if (conn.State == ConnectionState.Open)
@@ -554,9 +602,8 @@ namespace FIX_IT_Workshop
                 string contactNumber = txtDeleteCustomerContactNumber.Text;
                 string email = txtDeleteCustomerEmail.Text;
                 setCustomerPrimaryKey(name, surname, email, contactNumber);
-                MessageBox.Show(customerPrimaryKey.ToString());
                 deleteRecord($"DELETE FROM Client WHERE First_Name = '{txtDeleteCustomerFirstName.Text}' AND Last_Name = '{txtDeleteCustomerLastName.Text}' AND Contact_Number = '{txtDeleteCustomerContactNumber.Text}' AND Email = '{txtDeleteCustomerEmail.Text}'", false);
-                deleteRecord($"DELETE FROM Vehicle WHERE Client_ID = {customerPrimaryKey}", true);
+                deleteRecord($"DELETE FROM Vehicle WHERE Customer_ID = {customerPrimaryKey}", true);
                 resetDeleteCustomerFilter();
             }
         }
@@ -741,8 +788,18 @@ namespace FIX_IT_Workshop
 
         private void label6_Click(object sender, EventArgs e)
         {
-            //tbcHomepage is a TabControl 
-            changeHeading("Manage User", "Select applicable option");
+            if (!isAdmin)
+            {
+                btnRemove_Users.Enabled = false;
+                btnAdd_New_Users.Enabled = false;
+
+            }
+            else
+            {
+                btnRemove_Users.Enabled = true;
+                btnAdd_New_Users.Enabled = true;
+            }
+            changeHeading("Users", "Select applicable option");
             tbcHomepage.SelectedTab = tbpUsers;
             showNewUserPanel(pnlUsers);
             selectLabel(lblUsers);
@@ -763,6 +820,13 @@ namespace FIX_IT_Workshop
             selectedPanel.Visible = true;
         }
 
+        private void showReports(Panel selectedPanel)
+        {
+            pnlReportsBestInventory.Visible = false;
+
+            selectedPanel.Visible = true;
+        }
+
         private void showNewUserPanel(Panel selected_userPanel)
         {
             //Add jou eie panels wat op Users is
@@ -778,9 +842,12 @@ namespace FIX_IT_Workshop
         private void Homepage_Load(object sender, EventArgs e)
         {
             connectDatabase();
+            changeHeading("Manage customers", "Select an applicable option");
             tbcHomepage.SelectedTab = tbpAddCustomer;
             showNewCustomerPanel(pnlCustomerOptions);
             selectLabel(lblAddCustomer);
+
+            isAdmin = getAdminStatus(this.userId);
         }
 
         private void cBUsers_SelectedIndexChanged(object sender, EventArgs e)
@@ -876,52 +943,73 @@ namespace FIX_IT_Workshop
 
         private void btnAddSupp_Click(object sender, EventArgs e)
         {
-            try
-            {
-                conn = new SqlConnection(connstr);
-                conn.Open();
 
-                ds = new DataSet();
-                string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
-                command = new SqlCommand(sql, conn);
-                SqlDataAdapter adap = new SqlDataAdapter();
-                adap.InsertCommand = command;
-                adap.InsertCommand.ExecuteNonQuery();
-                // conn.Close();
-                tbCNumberSupp.Clear();
-                tbEmailSupp.Clear();
-                tbNameSupp.Clear();
-                // conn.Open();
-                adap = new SqlDataAdapter();
-                ds = new DataSet();
-                sql = "SELECT Name,Contact_Number,Email FROM Supplier";
-                command = new SqlCommand(sql, conn);
-                adap.SelectCommand = command;
-                adap.Fill(ds, "Supplier");
-                dgvSupp.DataSource = ds;
-                dgvSupp.DataMember = "Supplier";
-                conn.Close();
-            }
-            catch (SqlException sqlex)
+            if (!validateEmail(tbEmailSupp))
             {
-                MessageBox.Show(sqlex.ToString());
+                MessageBox.Show("Please enter a valid email");
             }
-            catch (Exception ex)
+            else if (tbCNumberSupp.Text.Length != 10)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show("Please enter a valid contact number");
             }
+            else
+            {
+                try
+                {
+
+                    //Open Connection
+                    if (conn.State != ConnectionState.Open)
+                    {
+                        conn.Open();
+                    }
+
+                    dataSet = new DataSet();
+                    string sql = $"INSERT INTO Supplier(Name,Contact_Number,Email) VALUES ('{tbNameSupp.Text}','{tbCNumberSupp.Text}','{tbEmailSupp.Text}' )";
+                    command = new SqlCommand(sql, conn);
+                    SqlDataAdapter adap = new SqlDataAdapter();
+                    adap.InsertCommand = command;
+                    adap.InsertCommand.ExecuteNonQuery();
+                    // conn.Close();
+                    tbCNumberSupp.Clear();
+                    tbEmailSupp.Clear();
+                    tbNameSupp.Clear();
+                    // conn.Open();
+                    adap = new SqlDataAdapter();
+                    dataSet = new DataSet();
+                    sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+                    command = new SqlCommand(sql, conn);
+                    adap.SelectCommand = command;
+                    adap.Fill(dataSet, "Supplier");
+                    dgvSupp.DataSource = dataSet;
+                    dgvSupp.DataMember = "Supplier";
+                    //Open Connection
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+                }
+                catch (SqlException sqlex)
+                {
+                    MessageBox.Show(sqlex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
-            conn = new SqlConnection(connstr);
+            conn = new SqlConnection(connectionString);
             conn.Open();
-            adap = new SqlDataAdapter();
-            ds = new DataSet();
+            dataAdapter = new SqlDataAdapter();
+            dataSet = new DataSet();
             string sql = $"SELECT Name, Email, Contact_Number FROM Supplier WHERE UPPER(Name) LIKE '%{tbNameSupp.Text.ToUpper()}%'";
             command = new SqlCommand(sql, conn);
-            adap.SelectCommand = command;
-            adap.Fill(ds, "Supplier");
+            dataAdapter.SelectCommand = command;
+            dataAdapter.Fill(dataSet, "Supplier");
             conn.Close();
         }
 
@@ -929,10 +1017,10 @@ namespace FIX_IT_Workshop
         {
             try
             {
-                conn = new SqlConnection(connstr);
+                conn = new SqlConnection(connectionString);
                 conn.Open();
 
-                ds = new DataSet();
+                dataSet = new DataSet();
                 string sql = $"DELETE FROM Supplier Where Name ='{dgvSupp[0, dgvSupp.CurrentRow.Index].Value}'";
 
                 command = new SqlCommand(sql, conn);
@@ -945,12 +1033,12 @@ namespace FIX_IT_Workshop
                 tbNameSupp.Clear();
                 // conn.Open();
                 adap = new SqlDataAdapter();
-                ds = new DataSet();
+                dataSet = new DataSet();
                 sql = "SELECT Name,Contact_Number,Email FROM Supplier";
                 command = new SqlCommand(sql, conn);
                 adap.SelectCommand = command;
-                adap.Fill(ds, "Supplier");
-                dgvSupp.DataSource = ds;
+                adap.Fill(dataSet, "Supplier");
+                dgvSupp.DataSource = dataSet;
                 dgvSupp.DataMember = "Supplier";
                 conn.Close();
             }
@@ -1188,7 +1276,7 @@ namespace FIX_IT_Workshop
         {
             showNewSalesPanel(pnlServices);
             pnlServices.BringToFront();
-            executeDisplaySql("SELECT DISTINCT Transact.Booked_Date, Transact.Status, Cust.First_Name, Cust.Last_Name FROM [Transaction] Transact JOIN Client Cust ON Transact.Client_ID = Cust.Client_ID JOIN Transaction_Item TransactItem ON Transact.Transaction_ID = TransactItem.Transaction_ID WHERE TransactItem.Transaction_Description = 'Service' AND Transact.Status <> 'Completed'", dagvBookingOfServices);
+            executeDisplaySql("SELECT DISTINCT Transact.Status, Cust.First_Name, Cust.Last_Name FROM [Transaction] Transact JOIN Client Cust ON Transact.Client_ID = Cust.Client_ID JOIN Transaction_Item TransactItem ON Transact.Transaction_ID = TransactItem.Transaction_ID WHERE TransactItem.Transaction_Description = 'Service' AND Transact.Status <> 'Completed'", dagvBookingOfServices);
 
             dpBookServiceTime.MinDate = DateTime.Today.AddHours(8);
             dpBookServiceTime.MaxDate = DateTime.Today.AddHours(15);
@@ -1331,7 +1419,7 @@ namespace FIX_IT_Workshop
                 }
 
                 //Count all matching emails to check for duplicates
-                String sql = $"SELECT Client_ID FROM Client WHERE UPPER(Email)  = '{email.ToUpper()}' AND UPPER(First_Name)  = '{firstName.ToUpper()}' AND UPPER(Last_Name)  = '{lastName.ToUpper()}' AND Contact_Number  = '{contactNumber}'";
+                String sql = $"SELECT Client_ID FROM [Client] WHERE UPPER(Email)  = '{email.ToUpper()}' AND UPPER(First_Name)  = '{firstName.ToUpper()}' AND UPPER(Last_Name)  = '{lastName.ToUpper()}' AND Contact_Number  = '{contactNumber}'";
 
                 // Initialize new Sql command
                 command = new SqlCommand(sql, conn);
@@ -1344,7 +1432,6 @@ namespace FIX_IT_Workshop
                 while (dataReader.Read())
                 {
                     customerPrimaryKey = dataReader.GetInt32(0);
-                    MessageBox.Show("Hi");
                 }
                 // Close conenction to DB
                 if (conn.State == ConnectionState.Open)
@@ -1377,7 +1464,7 @@ namespace FIX_IT_Workshop
                 }
 
                 //Count all matching emails to check for duplicates
-                String sql = $"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE Client_ID = {customerId}";
+                String sql = $"SELECT Make, Model, Year, License_Plate_Number FROM Vehicle WHERE Customer_ID = {customerId}";
 
                 // Initialize new Sql command
                 command = new SqlCommand(sql, conn);
@@ -1418,14 +1505,27 @@ namespace FIX_IT_Workshop
 
         private void btnUpdateCustomerDetailsConfirm_Click(object sender, EventArgs e)
         {
-            showNewCustomerPanel(pnlUpdateCustomerDetailsFilled);
-            txtUpdateCustomerDetailsFilledFirstName.Text = txtUpdateCustomerFirstName.Text;
-            txtUpdateCustomerDetailsFilledLastName.Text = txtUpdateCustomerLastName.Text;
-            txtUpdateCustomerDetailsFilledEmail.Text = txtUpdateCustomerEmail.Text;
-            txtUpdateCustomerDetailsFilledContactNumber.Text = txtUpdateCustomerContactNumber.Text;
+            if (!validateEmail(txtUpdateCustomerEmail))
+            {
+                MessageBox.Show("Please enter a valid email");
+            }
+            else if (txtUpdateCustomerContactNumber.Text.Length != 10)
+            {
+                MessageBox.Show("Please enter a valid contact number");
+            }
+            else
+            {
+                showNewCustomerPanel(pnlUpdateCustomerDetailsFilled);
+                txtUpdateCustomerDetailsFilledFirstName.Text = txtUpdateCustomerFirstName.Text;
+                txtUpdateCustomerDetailsFilledLastName.Text = txtUpdateCustomerLastName.Text;
+                txtUpdateCustomerDetailsFilledEmail.Text = txtUpdateCustomerEmail.Text;
+                txtUpdateCustomerDetailsFilledContactNumber.Text = txtUpdateCustomerContactNumber.Text;
 
-            setCustomerPrimaryKey(txtUpdateCustomerDetailsFilledFirstName.Text, txtUpdateCustomerDetailsFilledLastName.Text, txtUpdateCustomerDetailsFilledEmail.Text, txtUpdateCustomerDetailsFilledContactNumber.Text);
-            setCustomerUpdateVehicleFields(customerPrimaryKey);
+                setCustomerPrimaryKey(txtUpdateCustomerDetailsFilledFirstName.Text, txtUpdateCustomerDetailsFilledLastName.Text, txtUpdateCustomerDetailsFilledEmail.Text, txtUpdateCustomerDetailsFilledContactNumber.Text);
+                setCustomerUpdateVehicleFields(customerPrimaryKey);
+            }
+
+
 
         }
 
@@ -1450,10 +1550,7 @@ namespace FIX_IT_Workshop
 
                 btnUpdateCustomerDetailsConfirm.Enabled = true;
             }
-            else
-            {
-                btnUpdateCustomerDetailsConfirm.Enabled = false;
-            }
+
         }
 
         private void populateViewAllVehiclesTextBoxes()
@@ -1538,7 +1635,18 @@ namespace FIX_IT_Workshop
 
         private void btnUpdateCustomerDetailsFilledContinue_Click(object sender, EventArgs e)
         {
-            showNewCustomerPanel(pnlUpdateCustomerVehicleDetailsFilled);
+            if (!validateEmail(txtUpdateCustomerDetailsFilledEmail))
+            {
+                MessageBox.Show($"Please enter a valid email before continuing.");
+            }
+            else if (txtUpdateCustomerDetailsFilledContactNumber.Text.Length != 10)
+            {
+                MessageBox.Show("Please enter a valid contact number");
+            }
+            else
+            {
+                showNewCustomerPanel(pnlUpdateCustomerVehicleDetailsFilled);
+            }
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -1556,7 +1664,7 @@ namespace FIX_IT_Workshop
 
 
             updateRecord($"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}");
-            updateRecord($"UPDATE Vehicle SET Make = '{make}', Model = '{model}', Year = '{year}', License_Plate_Number = '{licensePlate}' WHERE Client_ID = ${customerPrimaryKey}");
+            updateRecord($"UPDATE Vehicle SET Make = '{make}', Model = '{model}', Year = '{year}', License_Plate_Number = '{licensePlate}' WHERE Customer_ID = ${customerPrimaryKey}");
         }
 
         private void btnUpdateCustomerVehicleDetailsFilledBack_Click(object sender, EventArgs e)
@@ -1949,8 +2057,8 @@ namespace FIX_IT_Workshop
                 try
                 {
                     //MessageBox.Show();
-                    string sql = $"INSERT INTO Transaction_Item (Transaction_ID, Transaction_Description, Inventory_ID, Quantity) VALUES (@transactionID, @transactionDescription, @inventoryID, @quantity)";
-                    int Inventory_ID = int.Parse(getValueInTable($"SELECT Id FROM Inventory WHERE UPPER(Product_Name) ='{items[i].ToString().ToUpper()}'", 0));
+                    string futureValue = getValueInTable($"SELECT Id FROM Inventory WHERE UPPER(Product_Name) = '{items[i].ToString().ToUpper()}'", 0);
+                    int Inventory_ID = int.Parse(futureValue);
                     descreaseItemQuantity(Inventory_ID, int.Parse(itemQuantity[i].ToString()));
 
 
@@ -1959,6 +2067,7 @@ namespace FIX_IT_Workshop
                     {
                         conn.Open();
                     }
+                    string sql = $"INSERT INTO Transaction_Item (Transaction_ID, Transaction_Description, Inventory_ID, Quantity) VALUES (@transactionID, @transactionDescription, @inventoryID, @quantity)";
 
                     command = new SqlCommand(sql, conn);
                     command.Parameters.AddWithValue("@transactionID", transactionId);
@@ -2141,7 +2250,7 @@ namespace FIX_IT_Workshop
         {
             string returnedClientId = getValueInTable($"SELECT Client_ID FROM Client WHERE Contact_Number = '{txtRepairClientNum.Text}'", 0);
 
-            if (string.IsNullOrEmpty(returnedClientId))
+            if (string.IsNullOrEmpty(returnedClientId) && pnlRepair.Visible == true)
             {
                 DialogResult result = MessageBox.Show("The client could not be found. Do you want to register the client?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
@@ -2403,9 +2512,11 @@ namespace FIX_IT_Workshop
                             purchaseItemsPrice.RemoveAt(i);
                         }
                     }
+
                 }
+
             }
-            displayRepairInfo();
+            displayPurchaseInfo();
         }
 
         private void dgvRepairsParts_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -2460,36 +2571,40 @@ namespace FIX_IT_Workshop
 
         private void txtPurchaseClientContactNum_Leave(object sender, EventArgs e)
         {
-
-            string returnedClientId = getValueInTable($"SELECT Client_ID FROM Client WHERE Contact_Number = '{txtPurchaseClientContactNum.Text}'", 0);
-
-            if (string.IsNullOrEmpty(returnedClientId))
+            if (pnlMakePurcahes.Visible == true)
             {
-                DialogResult result = MessageBox.Show("The client could not be found. Do you want to register the client?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
+                string returnedClientId = getValueInTable($"SELECT Client_ID FROM Client WHERE Contact_Number = '{txtPurchaseClientContactNum.Text}'", 0);
 
-                if (result == DialogResult.Yes)
+                if (string.IsNullOrEmpty(returnedClientId))
                 {
-                    changeHeading("Manage customers", "Select an applicable option");
-                    tbcHomepage.SelectedTab = tbpAddCustomer;
-                    btnDeleteCustomer.Enabled = false;
-                    showNewCustomerPanel(pnlCustomerOptions);
-                    selectLabel(lblAddCustomer);
+                    DialogResult result = MessageBox.Show("The client could not be found. Do you want to register the client?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+
+                    if (result == DialogResult.Yes)
+                    {
+                        changeHeading("Manage customers", "Select an applicable option");
+                        tbcHomepage.SelectedTab = tbpAddCustomer;
+                        btnDeleteCustomer.Enabled = false;
+                        showNewCustomerPanel(pnlCustomerOptions);
+                        selectLabel(lblAddCustomer);
+                    }
+                    else
+                    {
+                        txtPurchaseClientContactNum.Focus();
+                    }
                 }
                 else
                 {
-                    txtPurchaseClientContactNum.Focus();
+                    purchaseClientId = int.Parse(returnedClientId);
+                    displayPurchaseInfo();
                 }
-            }
-            else
-            {
-                purchaseClientId = int.Parse(returnedClientId);
-                displayPurchaseInfo();
+
+                purchaseItems.Clear();
+                purchaseItemsQuantity.Clear();
+                purchaseItemsPrice.Clear();
             }
 
-            purchaseItems.Clear();
-            purchaseItemsQuantity.Clear();
-            purchaseItemsPrice.Clear();
         }
 
         private void txtProductNumberFilter_TextChanged(object sender, EventArgs e)
@@ -2839,35 +2954,54 @@ namespace FIX_IT_Workshop
 
         private void btnUpdateSupp_Click(object sender, EventArgs e)
         {
-            //$"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}"
-            try
+            if (!validateEmail(tbEmailSupp))
             {
-                //MessageBox.Show(dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString());
-                updateRecord($"UPDATE Supplier SET Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}', Contact_Number = '{tbCNumberSupp.Text}', Email = '{tbEmailSupp.Text}' WHERE Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}'");
-
-                tbEmailSupp.Clear();
-                tbNameSupp.Clear();
-                tbCNumberSupp.Clear();
-
-                conn = new SqlConnection(connstr);
-                conn.Open();
-                adap = new SqlDataAdapter();
-                ds = new DataSet();
-                string sql = "SELECT Name,Contact_Number,Email FROM Supplier";
-                command = new SqlCommand(sql, conn);
-                adap.SelectCommand = command;
-                adap.Fill(ds, "Supplier");
-                dgvSupp.DataSource = ds;
-                dgvSupp.DataMember = "Supplier";
-                conn.Close();
+                MessageBox.Show("Please enter a valid email");
             }
-            catch (SqlException sqlex)
+            else if (tbCNumberSupp.Text.Length != 10)
             {
-                MessageBox.Show(sqlex.ToString());
+                MessageBox.Show("Please enter a valid contact number");
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.ToString());
+                try
+                {
+
+                    updateRecord($"UPDATE Supplier SET Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}', Contact_Number = '{tbCNumberSupp.Text}', Email = '{tbEmailSupp.Text}' WHERE Name = '{dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString()}'");
+
+                    tbEmailSupp.Clear();
+                    tbNameSupp.Clear();
+                    tbCNumberSupp.Clear();
+
+                    // Close conenction to DB
+                    if (conn.State != ConnectionState.Open)
+                    {
+                        conn.Open();
+                    }
+
+                    dataAdapter = new SqlDataAdapter();
+                    dataSet = new DataSet();
+                    string sql = "SELECT Name,Contact_Number,Email FROM Supplier";
+                    command = new SqlCommand(sql, conn);
+                    dataAdapter.SelectCommand = command;
+                    dataAdapter.Fill(dataSet, "Supplier");
+                    dgvSupp.DataSource = dataSet;
+                    dgvSupp.DataMember = "Supplier";
+
+                    // Close conenction to DB
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+                }
+                catch (SqlException sqlex)
+                {
+                    MessageBox.Show(sqlex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
         }
 
@@ -2882,96 +3016,117 @@ namespace FIX_IT_Workshop
 
         private void tbProductNumber_TextChanged(object sender, EventArgs e)//Zohan
         {
-            try
-            {
-                conn.Close();
-                conn.Open();
-                adap = new SqlDataAdapter();
-                ds = new DataSet();
-                string sql =
-                     $@"
-                SELECT 
-                    Inventory.Product_Number,
-                    Inventory.Product_Name,
-                    Inventory.Available_Quantity,
-                    Inventory.Unit_Price,
-                    Supplier.Name AS Supplier_Name
-                FROM 
-                    Inventory
-                INNER JOIN 
-                    Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID
-                WHERE Inventory.Product_Number LIKE '%{tbProductNumber.Text}%'";
-                Console.WriteLine("Generated SQL Query: " + sql);
-                SqlDataAdapter adapter = new SqlDataAdapter(sql, conn);
-                DataTable dataTable2 = new DataTable(sql);
-                command = new SqlCommand(sql, conn);
+            //try
+            //{
+            //    if (conn.State != ConnectionState.Open)
+            //    {
+            //        conn.Open();
+            //    }
+            //    dataAdapter = new SqlDataAdapter();
+            //    dataSet = new DataSet();
+            //    string sql =
+            //         $@"
+            //    SELECT 
+            //        Inventory.Product_Number,
+            //        Inventory.Product_Name,
+            //        Inventory.Available_Quantity,
+            //        Inventory.Unit_Price,
+            //        Supplier.Name AS Supplier_Name
+            //    FROM 
+            //        Inventory
+            //    INNER JOIN 
+            //        Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID
+            //    WHERE Inventory.Product_Number LIKE '%{tbProductNumber.Text}%'";
+            //    Console.WriteLine("Generated SQL Query: " + sql);
+            //    SqlDataAdapter adapter = new SqlDataAdapter(sql, conn);
+            //    DataTable dataTable2 = new DataTable(sql);
+            //    command = new SqlCommand(sql, conn);
 
-                adap.SelectCommand = command;
-                adap.Fill(dataTable2);
-                dgvProductStock.DataSource = dataTable2;
-                dgvProductStock.Refresh();
-                //dgvSupp.DataMember = "Supplier";
-                conn.Close();
-            }
-            catch (SqlException sqlEx)
-            {
+            //    dataAdapter.SelectCommand = command;
+            //    dataAdapter.Fill(dataTable2);
+            //    dgvProductStock.DataSource = dataTable2;
+            //    dgvProductStock.Refresh();
+            //    //dgvSupp.DataMember = "Supplier";
+            //    if (conn.State == ConnectionState.Open)
+            //    {
+            //        conn.Close();
+            //    }
+            //}
+            //catch (SqlException sqlEx)
+            //{
 
-                MessageBox.Show(sqlEx.ToString());
-            }
-            catch (Exception Ex)
-            {
+            //    MessageBox.Show(sqlEx.ToString());
+            //}
+            //catch (Exception Ex)
+            //{
 
-                MessageBox.Show(Ex.ToString());
-            }
+            //    MessageBox.Show(Ex.ToString());
+            //}
         }
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
-            try
+            if (string.IsNullOrEmpty(tbProductNumber.Text) || (string.IsNullOrEmpty(tbProductName.Text)) || sedAdd.Value == 0 || cbxSupplierStock.SelectedIndex == -1 || string.IsNullOrEmpty(tbPriceProductStock.Text))
             {
-                conn.Open();
-                ds = new DataSet();
-                string sql = $"INSERT INTO Inventory(Product_Number,Product_Name,Available_Quantity,Unit_Price,Supplier_ID) VALUES (@Value1,@Value2,@Value3,@Value4,@Value5)";
-                SqlCommand cmd0 = new SqlCommand(sql, conn);
-                cmd0.Parameters.AddWithValue("@Value1", tbProductNumber.Text);
-                cmd0.Parameters.AddWithValue("@Value2", tbProductName.Text);
-                cmd0.Parameters.AddWithValue("@Value3", sedAdd.Value);
-                cmd0.Parameters.AddWithValue("@Value4", decimal.Parse(tbPriceProductStock.Text));
-
-                string CommandStock = $"SELECT Supplier_ID FROM Supplier WHERE Name = '{cbxSupplierStock.SelectedItem.ToString()}'";
-                SqlCommand cmd = new SqlCommand(CommandStock, conn);
-                dataReader = cmd.ExecuteReader();
-                int suppID = 0;
-                while (dataReader.Read())
+                MessageBox.Show("Please fill out all fields before continuing");
+            }
+            else
+            {
+                try
                 {
-                    suppID = (int)dataReader.GetValue(0);
+                    if (conn.State != ConnectionState.Open)
+                    {
+                        conn.Open();
+                    }
+                    dataSet = new DataSet();
+                    string sql = $"INSERT INTO Inventory(Product_Number,Product_Name,Available_Quantity,Unit_Price,Supplier_ID) VALUES (@Value1,@Value2,@Value3,@Value4,@Value5)";
+                    SqlCommand cmd0 = new SqlCommand(sql, conn);
+                    cmd0.Parameters.AddWithValue("@Value1", tbProductNumber.Text);
+                    cmd0.Parameters.AddWithValue("@Value2", tbProductName.Text);
+                    cmd0.Parameters.AddWithValue("@Value3", sedAdd.Value);
+                    cmd0.Parameters.AddWithValue("@Value4", decimal.Parse(tbPriceProductStock.Text));
+
+                    string CommandStock = $"SELECT Supplier_ID FROM Supplier WHERE Name = '{cbxSupplierStock.SelectedItem.ToString()}'";
+                    SqlCommand cmd = new SqlCommand(CommandStock, conn);
+                    dataReader = cmd.ExecuteReader();
+                    int suppID = 0;
+                    while (dataReader.Read())
+                    {
+                        suppID = (int)dataReader.GetValue(0);
+
+                    }
+                    cmd0.Parameters.AddWithValue("@Value5", suppID);
+                    dataReader.Close();
+                    SqlDataAdapter adap = new SqlDataAdapter();
+
+                    adap.InsertCommand = cmd0;
+                    adap.InsertCommand.ExecuteNonQuery();
+                    // conn.Close();
+                    tbProductNumber.Clear();
+                    tbProductName.Clear();
+                    cbxSupplierStock.SelectedIndex = -1;
+                    sedAdd.Value = 0;
+                    tbPriceProductStock.Clear();
+                    // conn.Open();
+                    dgvProductStock.Refresh();
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+
+                    MessageBox.Show("Product has been successfully added!");
 
                 }
-                cmd0.Parameters.AddWithValue("@Value5", suppID);
-                dataReader.Close();
-                SqlDataAdapter adap = new SqlDataAdapter();
+                catch (SqlException sqlEx)
+                {
 
-                adap.InsertCommand = cmd0;
-                adap.InsertCommand.ExecuteNonQuery();
-                // conn.Close();
-                tbProductNumber.Clear();
-                tbProductName.Clear();
-                cbxSupplierStock.SelectedIndex = -1;
-                sedAdd.Value = 0;
-                tbPriceProductStock.Clear();
-                // conn.Open();
-                dgvProductStock.Refresh();
-                conn.Close();
-            }
-            catch (SqlException sqlEx)
-            {
+                    MessageBox.Show(sqlEx.ToString());
+                }
+                catch (Exception Ex)
+                {
 
-                MessageBox.Show(sqlEx.ToString());
-            }
-            catch (Exception Ex)
-            {
-
-                MessageBox.Show(Ex.ToString());
+                    MessageBox.Show(Ex.ToString());
+                }
             }
         }
 
@@ -2985,106 +3140,53 @@ namespace FIX_IT_Workshop
 
         }
 
+
+
+
+
         private void btnDeleteProductStock_Click(object sender, EventArgs e)
         {
-            try
+
+
+
+            if (string.IsNullOrEmpty(tbProductNumber.Text))
             {
+                MessageBox.Show("Please select a record before continuing");
+            }
+            else
+            {
+                DialogResult result = MessageBox.Show("Are you sure you want to delete this record? This cannout be undone.", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-                conn.Open();
 
-                ds = new DataSet();
-                string sql = $"DELETE FROM Inventory Where Product_Number ='{dgvProductStock[0, dgvProductStock.CurrentRow.Index].Value}'";
+                if (result == DialogResult.Yes)
+                {
+                    deleteRecord($"DELETE FROM Inventory Where Product_Number ='{tbProductNumber.Text}'", true);
+                }
 
-                command = new SqlCommand(sql, conn);
-                SqlDataAdapter adap = new SqlDataAdapter();
-                adap.InsertCommand = command;
-                adap.InsertCommand.ExecuteNonQuery();
-                // conn.Close();
                 tbProductNumber.Clear();
                 tbProductName.Clear();
                 sedAdd.Value = 0;
                 cbxSupplierStock.SelectedIndex = -1;
                 tbPriceProductStock.Clear();
-                // conn.Open();
-                string query = @"
-                SELECT 
-                    Inventory.Product_Number,
-                    Inventory.Product_Name,
-                    Inventory.Available_Quantity,
-                    Inventory.Unit_Price,
-                    Supplier.Name AS Supplier_Name
-                FROM 
-                    Inventory
-                INNER JOIN 
-                    Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID";
 
-                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                DataTable dataTable = new DataTable();
-                adapter.Fill(dataTable);
-                dgvProductStock.DataSource = dataTable;
-                conn.Close();
+                executeDisplaySql(@"SELECT Inventory.Product_Number, Inventory.Product_Name, Inventory.Available_Quantity, Inventory.Unit_Price, Supplier.Name AS Supplier_Name FROM Inventory INNER JOIN Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID", dgvProductStock);
             }
-            catch (SqlException sqlex)
-            {
-                MessageBox.Show(sqlex.ToString());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+
         }
 
         private void btnUpdateProductStock_Click(object sender, EventArgs e)
         {
-            //$"UPDATE Client SET First_name = '{firstName}', Last_Name = '{lastName}', Email = '{email}', Contact_Number = '{contactNumber}' WHERE Client_ID = ${customerPrimaryKey}"
-            try
+            if (string.IsNullOrEmpty(tbProductNumber.Text))
             {
-                conn.Open();
-                //MessageBox.Show(dgvSupp[0, dgvSupp.CurrentRow.Index].Value.ToString());
-                string CommandStock = $"SELECT Supplier_ID FROM Supplier WHERE Name = '{cbxSupplierStock.SelectedItem.ToString()}'";
-                SqlCommand cmd = new SqlCommand(CommandStock, conn);
-                dataReader = cmd.ExecuteReader();
-                int suppID = 0;
-
-                while (dataReader.Read())
-                {
-                    suppID = (int)dataReader.GetValue(0);
-
-                }
-
-                dataReader.Close();
-                updateRecord($"UPDATE Inventory SET  Product_Number = '{dgvProductStock[0, dgvProductStock.CurrentRow.Index].Value.ToString()}' ,Product_Name = '{tbProductName.Text}', Available_Quantity = {sedAdd.Value.ToString()}, Unit_Price = {tbPriceProductStock.Text}, Supplier_ID = {suppID.ToString()} WHERE Product_Number = '{dgvProductStock[0, dgvProductStock.CurrentRow.Index].Value.ToString()}'");
-
-                tbEmailSupp.Clear();
-                tbNameSupp.Clear();
-                tbCNumberSupp.Clear();
-
-                string query = @"
-                SELECT 
-                    Inventory.Product_Number,
-                    Inventory.Product_Name,
-                    Inventory.Available_Quantity,
-                    Inventory.Unit_Price,
-                    Supplier.Name AS Supplier_Name
-                FROM 
-                    Inventory
-                INNER JOIN 
-                    Supplier ON Inventory.Supplier_ID = Supplier.Supplier_ID";
-
-                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                DataTable dataTable = new DataTable();
-                adapter.Fill(dataTable);
-                dgvProductStock.DataSource = dataTable;
-                conn.Close();
+                MessageBox.Show("Please select a field before continuing");
             }
-            catch (SqlException sqlex)
+            else
             {
-                MessageBox.Show(sqlex.ToString());
+                string suppID = getValueInTable($"SELECT Supplier_ID FROM Supplier WHERE Name = '{cbxSupplierStock.SelectedItem.ToString()}'", 0);
+                updateRecord($"UPDATE Inventory SET  Product_Number = '{tbProductNumber.Text}', Product_Name = '{tbProductName.Text}', Available_Quantity = { sedAdd.Text}, Unit_Price = { tbPriceProductStock.Text}, Supplier_ID = { suppID} WHERE Product_Number = '{ dgvProductStock.SelectedRows[0].Cells["Product_Number"].Value}'");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+
+
         }
 
         private void btnClear_View_All_Users_panel_Click(object sender, EventArgs e)
@@ -3181,6 +3283,8 @@ namespace FIX_IT_Workshop
             return password;
         }
 
+
+
         private void populateUpdateUserDetailsTextBoxes()
         {
             try
@@ -3190,37 +3294,47 @@ namespace FIX_IT_Workshop
                     // Get the selected row
                     DataGridViewRow selectedRow = dGV_Update_User_Details_panel.SelectedRows[0];
 
-                    // Access the cell values from the selected row using column indexes
-                    string firstName = selectedRow.Cells["First_Name"].Value.ToString();
-                    string lastName = selectedRow.Cells["Last_Name"].Value.ToString();
-
-                    string contactNumber = selectedRow.Cells["Contact_Number"].Value.ToString();
-                    string email = selectedRow.Cells["Email"].Value.ToString();
-
-                    string userRole = selectedRow.Cells["User_Role"].Value.ToString();
-                    if (userRole.Trim() == "Admin")
+                    if (!isAdmin && userId != int.Parse((getValueInTable($"SELECT User_ID FROM [USER] WHERE Contact_Number = '{selectedRow.Cells["Contact_Number"].Value.ToString()}' AND Email = '{selectedRow.Cells["Email"].Value.ToString()}'", 0))))
                     {
-                        cBUserRole_Update_User_Details_panel.SelectedIndex = 0;
-                    }
-                    else if (userRole.Trim() == "Mechanic")
-                    {
-                        cBUserRole_Update_User_Details_panel.SelectedIndex = 1;
+                        MessageBox.Show("You do not have permission to update this record", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
                     }
                     else
                     {
-                        cBUserRole_Update_User_Details_panel.SelectedIndex = -1;
+                        // Access the cell values from the selected row using column indexes
+                        string firstName = selectedRow.Cells["First_Name"].Value.ToString();
+                        string lastName = selectedRow.Cells["Last_Name"].Value.ToString();
+
+                        string contactNumber = selectedRow.Cells["Contact_Number"].Value.ToString();
+                        string email = selectedRow.Cells["Email"].Value.ToString();
+
+                        string userRole = selectedRow.Cells["User_Role"].Value.ToString();
+                        if (userRole.Trim() == "Admin")
+                        {
+                            cBUserRole_Update_User_Details_panel.SelectedIndex = 0;
+                        }
+                        else if (userRole.Trim() == "Mechanic")
+                        {
+                            cBUserRole_Update_User_Details_panel.SelectedIndex = 1;
+                        }
+                        else
+                        {
+                            cBUserRole_Update_User_Details_panel.SelectedIndex = -1;
+                        }
+
+
+                        txtFirstName_Update_User_Details_panel.Text = firstName;
+                        txtLastName_Update_User_Details_panel.Text = lastName;
+
+                        txtContactNumber_Update_User_Details_panel.Text = contactNumber;
+                        txtEmail_Update_User_Details_panel.Text = email;
+
+                        txtNewPassword_Update_User_Details_panel.Text = (getUserPassword(firstName, lastName, contactNumber, email, userRole));
+
+                        btnUpdate_User_Details_Update_User_Details_panel.Enabled = true;
+
                     }
 
-
-                    txtFirstName_Update_User_Details_panel.Text = firstName;
-                    txtLastName_Update_User_Details_panel.Text = lastName;
-
-                    txtContactNumber_Update_User_Details_panel.Text = contactNumber;
-                    txtEmail_Update_User_Details_panel.Text = email;
-
-                    txtNewPassword_Update_User_Details_panel.Text = getUserPassword(firstName, lastName, contactNumber, email, userRole);
-
-                    btnUpdate_User_Details_Update_User_Details_panel.Enabled = true;
                 }
                 else
                 {
@@ -3234,8 +3348,11 @@ namespace FIX_IT_Workshop
 
         }
 
+       
+
         private void dGV_Update_User_Details_panel_SelectionChanged(object sender, EventArgs e)
         {
+
             populateUpdateUserDetailsTextBoxes();
         }
 
@@ -3300,13 +3417,21 @@ namespace FIX_IT_Workshop
             {
                 MessageBox.Show("Please fill out all fields and enter the appropriate values.");
             }
+            else if (!validateEmail(txtEmail_Update_User_Details_panel))
+            {
+                MessageBox.Show("Please enter a valid email");
+            }
+            else if (txtContactNumber_Update_User_Details_panel.Text.Length != 10)
+            {
+                MessageBox.Show("Please enter a valid contact number");
+            }
             else
             {
                 // Call the function that updates the values in the table
                 DataGridViewRow selectedRow = dGV_Update_User_Details_panel.SelectedRows[0];
 
                 int selectedUserId = getUserId(selectedRow.Cells["First_Name"].Value.ToString(), selectedRow.Cells["Last_Name"].Value.ToString(), selectedRow.Cells["Contact_Number"].Value.ToString(), selectedRow.Cells["Email"].Value.ToString());
-                updateRecord($"UPDATE [User] SET First_name = '{txtFirstName_Update_User_Details_panel.Text}', Last_Name = '{txtLastName_Update_User_Details_panel.Text}', Email = '{txtEmail_Update_User_Details_panel.Text}', Contact_Number = '{txtContactNumber_Update_User_Details_panel.Text}', User_Role = '{cBUserRole_Update_User_Details_panel.Text}', Password = '{txtNewPassword_Update_User_Details_panel.Text}' WHERE User_ID = ${selectedUserId}");
+                updateRecord($"UPDATE [User] SET First_name = '{txtFirstName_Update_User_Details_panel.Text}', Last_Name = '{txtLastName_Update_User_Details_panel.Text}', Email = '{txtEmail_Update_User_Details_panel.Text}', Contact_Number = '{txtContactNumber_Update_User_Details_panel.Text}', User_Role = '{cBUserRole_Update_User_Details_panel.Text}', Password = '{(txtNewPassword_Update_User_Details_panel.Text)}' WHERE User_ID = ${selectedUserId}");
                 executeDisplaySql("SELECT First_Name, Last_Name, Email, Contact_Number, User_Role FROM [User]", dGV_Update_User_Details_panel);
 
                 txtFirstName_Update_User_Details_panel.Clear();
@@ -3379,14 +3504,14 @@ namespace FIX_IT_Workshop
 
             try
             {
-                conn = new SqlConnection(connstr);
+                conn = new SqlConnection(connectionString);
                 // Close connection if open
                 if (conn.State == ConnectionState.Closed)
                 {
                     conn.Open();
                 }
 
-                ds = new DataSet();
+                dataSet = new DataSet();
                 string sql = $"DELETE FROM [User] Where User_ID = '{selectedUserId}'";
 
                 command = new SqlCommand(sql, conn);
@@ -3511,7 +3636,7 @@ namespace FIX_IT_Workshop
             catch (SqlException sqlException)
             {
                 //Show suitable error message
-                MessageBox.Show("Sign up failed.\nPlease try again later." + sqlException.Message);
+                MessageBox.Show("Sign up failed.\nPlease try again later.");
 
                 //Close connection
                 if (conn.State == ConnectionState.Open)
@@ -3568,9 +3693,17 @@ namespace FIX_IT_Workshop
             {
                 MessageBox.Show("You have empty textboxes. \n Enter the appropriate values.");
             }
+            else if (!validateEmail(txtEmail_AddUsers_panel))
+            {
+                MessageBox.Show("Please enter a valid email");
+            }
+            else if (txtContactNumber_AddUsers_panel.Text.Length != 10)
+            {
+                MessageBox.Show("Please enter a valid contact number");
+            }
             else
             {
-                add_New_User_AddUsers_panel(txtUsername_AddUsers_panel.Text, txtFirstName_AddUsers_panel.Text, txtLastName_AddUsers_panel.Text, txtContactNumber_AddUsers_panel.Text, txtEmail_AddUsers_panel.Text, cBUserRole_AddUsers_panel.Text, txtPassword_AddUsers_panel.Text);
+                add_New_User_AddUsers_panel(txtUsername_AddUsers_panel.Text, txtFirstName_AddUsers_panel.Text, txtLastName_AddUsers_panel.Text, txtContactNumber_AddUsers_panel.Text, txtEmail_AddUsers_panel.Text, cBUserRole_AddUsers_panel.Text, (txtPassword_AddUsers_panel.Text));
 
                 executeDisplaySql("SELECT First_Name, Last_Name, Email, Contact_Number, User_Role FROM [User]", dGV_Add_New_Users_panel);
 
@@ -3613,6 +3746,431 @@ namespace FIX_IT_Workshop
             executeDisplaySql("SELECT First_Name, Last_Name, Email, Contact_Number, User_Role FROM [User]", dGV_pnlRemove_Users_Display);
             pnlRemove_Users.BringToFront();
             btnRemove_User_panel.Enabled = false;
+        }
+
+        public Dictionary<string, int> getTopProductsFromTable(int amount)
+        {
+            Dictionary<string, int> topProdcuts = new Dictionary<string, int>();
+            try
+            {
+                // Open connection to the DB
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+
+
+
+                // Initialize new Sql command
+                command = new SqlCommand($" SELECT DISTINCT Inventory_ID, SUM(Quantity) AS TotalQuantity FROM Transaction_Item WHERE Transaction_Description = 'Sale' GROUP BY Inventory_ID ORDER BY TotalQuantity DESC", conn);
+
+                // Execute command
+                dataReader = command.ExecuteReader();
+
+
+                int counter = 0;
+                int[] inventoryIds = new int[amount];
+                int[] quantityTotal = new int[amount];
+                while (dataReader.Read() && counter < amount)
+                {
+                    inventoryIds[counter] = int.Parse(dataReader.GetValue(0).ToString());
+                    quantityTotal[counter] = int.Parse(dataReader.GetValue(1).ToString());
+                    counter++;
+                }
+                // Close conenction to DB
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
+                for (int i = 0; i < inventoryIds.Length; i++)
+                {
+                    string itemName = getValueInTable($"SELECT Product_Name FROM Inventory WHERE Id = {inventoryIds[i]}", 0);
+
+                    if (!topProdcuts.ContainsKey(itemName))
+                    {
+                        topProdcuts.Add(itemName, quantityTotal[i]);
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display suitable error dialog
+                MessageBox.Show("An error has occured " + ex.Message);
+
+                // Close connection if open
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+            return topProdcuts;
+        }
+
+        public void populateChart(int amount)
+        {
+            Dictionary<string, int> topProducts = getTopProductsFromTable(amount);
+
+            crtBestSellingProducts.Series["Inventory"].Points.Clear();
+            foreach (var product in topProducts)
+            {
+                crtBestSellingProducts.Series["Inventory"].Points.AddXY(product.Key, product.Value);
+            }
+        }
+
+        public double[] getFinData(string type)
+        {
+            double[] selectedRow = new double[150];
+            try
+            {
+                // Open connection to the DB
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+
+                int selectedIndex = 0;
+
+                //switch (type)
+                //{
+                //    case ("Month"):
+                //        {
+                //            command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //            break;
+                //        }
+
+                //    case ("Service"):
+                //        {
+                //            command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month, SUM(CASE WHEN TI.Transaction_Description = 'Service' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalServices FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //            selectedIndex = 1;
+                //            break;
+                //        }
+
+                //    case ("Sale"):
+                //        {
+                //            command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month, SUM(CASE WHEN TI.Transaction_Description = 'Sale' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalSales FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //            selectedIndex = 1;
+                //            break;
+                //        }
+
+                //    case ("Repair"):
+                //        {
+                //            command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month, SUM(CASE WHEN TI.Transaction_Description = 'Repair' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalRepairs FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //            selectedIndex = 1;
+                //            break;
+                //        }
+
+                //    case ("Replenishment"):
+                //        {
+                //            command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month, SUM(CASE WHEN TI.Transaction_Description = 'Replenishment' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalReplenishments FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //            selectedIndex = 1;
+                //            break;
+                //        }
+
+                //    default:
+                //        command = new SqlCommand($"SELECT MONTH(T.Payment_Date) AS Month, SUM(CASE WHEN TI.Transaction_Description = 'Sale' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalSales, SUM(CASE WHEN TI.Transaction_Description = 'Service' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalServices, SUM(CASE WHEN TI.Transaction_Description = 'Repair' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalRepairs, SUM(CASE WHEN TI.Transaction_Description = 'Replenishment' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalReplenishments FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+                //        break;
+                //}
+
+                // Initialize new Sql command
+                command = new SqlCommand($"SELECT SUM(CASE WHEN TI.Transaction_Description = 'Sale' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalSales, SUM(CASE WHEN TI.Transaction_Description = 'Service' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalServices, SUM(CASE WHEN TI.Transaction_Description = 'Repair' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalRepairs, SUM(CASE WHEN TI.Transaction_Description = 'Replenishment' THEN T.Total_Amount - T.Discount_Amount ELSE 0 END) AS TotalReplenishments FROM Transaction_Item TI JOIN [Transaction] T ON TI.Transaction_ID = T.Transaction_ID GROUP BY MONTH(T.Payment_Date) ORDER BY Month", conn);
+
+                // Execute command
+                dataReader = command.ExecuteReader();
+
+
+                int counter = 0;
+                while (dataReader.Read())
+                {
+                    selectedRow[counter] = double.Parse(dataReader.GetValue(selectedIndex).ToString());
+                    selectedRow[counter + 1] = double.Parse(dataReader.GetValue(selectedIndex).ToString());
+                    selectedRow[counter + 2] = double.Parse(dataReader.GetValue(selectedIndex).ToString());
+                    selectedRow[counter + 3] = double.Parse(dataReader.GetValue(selectedIndex).ToString());
+                    counter++;
+                }
+                // Close conenction to DB
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display suitable error dialog
+                MessageBox.Show("An error has occured " + ex.Message);
+
+                // Close connection if open
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+
+            return selectedRow;
+        }
+
+
+        public void switchBestSellingProductView()
+        {
+            crtBestSellingProducts.Visible = !crtBestSellingProducts.Visible;
+            dgvBestSellingProductsSummary.Visible = !dgvBestSellingProductsSummary.Visible;
+
+            if (crtBestSellingProducts.Visible)
+            {
+                btnSwitchBestSellingProductView.Text = "Text Based Representation";
+            }
+            else
+            {
+                btnSwitchBestSellingProductView.Text = "Chart Based Representation";
+            }
+        }
+
+        public void populateDataGridView(int amount)
+        {
+            executeDisplaySql($"SELECT TOP {amount} I.Product_Name, SUM(CASE WHEN TI.Transaction_Description = 'Sale' THEN TI.Quantity ELSE 0 END) AS SaleQuantity, SUM(CASE WHEN TI.Transaction_Description = 'Service' THEN TI.Quantity ELSE 0 END) AS ServiceQuantity, SUM(CASE WHEN TI.Transaction_Description = 'Repair' THEN TI.Quantity ELSE 0 END) AS RepairQuantity, SUM(CASE WHEN TI.Transaction_Description = 'Replenishment' THEN TI.Quantity ELSE 0 END) AS ReplenishmentQuantity FROM Transaction_Item TI JOIN Inventory I ON TI.Inventory_ID = I.Id GROUP BY TI.Inventory_ID, I.Product_Name ORDER BY SaleQuantity DESC", dgvBestSellingProductsSummary);
+        }
+
+        private void btnTopPerformingProducts_Click_1(object sender, EventArgs e)
+        {
+            dgvBestSellingProductsSummary.Visible = true;
+            crtBestSellingProducts.Visible = false;
+
+            showReports(pnlReportsBestInventory);
+
+
+            populateChart(5);
+            populateDataGridView(5);
+        }
+
+        private void button8_Click_1(object sender, EventArgs e)
+        {
+            lblSelectBestPerformingProducts.Text = "Top 10 best selling products:";
+            populateChart(10);
+            populateDataGridView(10);
+        }
+
+        private void btnTop5Products_Click(object sender, EventArgs e)
+        {
+            lblSelectBestPerformingProducts.Text = "Top 5 best selling products:";
+            populateChart(5);
+            populateDataGridView(5);
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            switchBestSellingProductView();
+        }
+
+        private void txtDeleteCustomerContactNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtCustomerVehicleYear_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtCustomerVehicleYear_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtUpdateCustomerVehicleDetailsFilledYear_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private bool validateEmail(TextBox txtEmail)
+        {
+            bool validEmail = true;
+
+            //Email validation pattern
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+
+            //Create a Regex object with the pattern
+            Regex regex = new Regex(pattern);
+
+            //Match the email against the declared pattern
+            Match match = regex.Match(txtEmail.Text);
+
+            //Check if email is valid
+            validEmail = match.Success;
+
+            //Return result
+            return validEmail;
+        }
+
+        private void txtCustomerContactNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtUpdateCustomerDetailsFilledContactNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtViewAllVehiclesYear_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtUpdateCustomerContactNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtCustomerContactNumberFilter_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtRepairClientNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtPurchaseClientContactNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtServiceCustomersNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtRefundContactNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void tbCNumberSupp_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void cbxSupplierStock_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tbPriceProductStock_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtContactNumber_Update_User_Details_panel_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtContact_Number_pnlRemove_Users_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtContactNumber_AddUsers_panel_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void populateDeleteStockTextBoxes()
+        {
+            // Check if any row is selected
+            if (dgvProductStock.SelectedRows.Count > 0)
+            {
+                // Get the selected row
+                DataGridViewRow selectedRow = dgvProductStock.SelectedRows[0];
+
+                // Access the cell values from the selected row using column indexes
+                cbxSupplierStock.Text = selectedRow.Cells["Supplier_Name"].Value.ToString();
+                tbProductName.Text = selectedRow.Cells["Product_Name"].Value.ToString();
+                tbProductNumber.Text = selectedRow.Cells["Product_Number"].Value.ToString();
+                tbPriceProductStock.Text = selectedRow.Cells["Unit_Price"].Value.ToString();
+                sedAdd.Text = selectedRow.Cells["Available_Quantity"].Value.ToString();
+
+
+                btnDeleteCustomer.Enabled = true;
+            }
+
+
+        }
+
+        private void dgvProductStock_SelectionChanged(object sender, EventArgs e)
+        {
+            populateDeleteStockTextBoxes();
+        }
+
+        private void dgvProductStock_SizeChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tbPriceProductStock_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtRepairClientNum_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

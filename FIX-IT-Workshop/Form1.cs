@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Data.SqlClient;
+using System.Text;
+using System.Windows.Forms;
 
 namespace FIX_IT_Workshop
 {
@@ -45,7 +40,7 @@ namespace FIX_IT_Workshop
             catch (SqlException sqlException)
             {
                 //Display appropiate message to the user
-                MessageBox.Show("An error has occurred. Please try again later.");
+                MessageBox.Show("An error has occurred. Please try again later." + sqlException.Message);
                 //Write error to console for debuging
                 Console.WriteLine($"SqlError: {sqlException.Message}");
             }
@@ -115,7 +110,7 @@ namespace FIX_IT_Workshop
                 {
                     if (dataReader.GetValue(1).ToString() == username)
                     {
-                        if (dataReader.GetValue(2).ToString() == password)
+                        if (dataReader.GetValue(2).ToString() == (password))
                         {
                             validUser = true;
                             userId = int.Parse(dataReader.GetValue(0).ToString());
@@ -132,8 +127,6 @@ namespace FIX_IT_Workshop
                     conn.Close();
                 }
 
-                //TODO: REMOVE LINE BELOW BEFORE SUMBITING!!!
-                validUser = true;
 
                 if (validUser)
                 {
@@ -160,14 +153,15 @@ namespace FIX_IT_Workshop
             }
         }
 
+      
+
         private void btnLogIn_Click(object sender, EventArgs e)
         {
+
             //Check if user has entered all values
             bool isValidated = validateForm();
 
 
-            //TODO: REMOVE LINE BELOW BEFORE SUMBITING!!!
-            isValidated = true;
             if (isValidated)
             {
                 //Attempt to log user in
@@ -188,6 +182,11 @@ namespace FIX_IT_Workshop
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void txtUsername_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
